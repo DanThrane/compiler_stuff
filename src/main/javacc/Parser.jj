@@ -1,0 +1,96 @@
+options {
+    STATIC = false;
+}
+
+PARSER_BEGIN(Parser)
+    package dk.thrane.compiler.parser;
+
+    import dk.thrane.compiler.ast.*;
+
+    public class Parser {
+
+    }
+PARSER_END(Parser)
+
+/*
+ * Tokens
+ */
+SKIP : { " " }
+SKIP : { "\n" | "\r" | "\r\n" }
+
+TOKEN : { < NUMBER  :   (["0"-"9"])+ >  }
+TOKEN : { < MULT    :   "*" >           }
+TOKEN : { < DIV     :   "/" >           }
+TOKEN : { < ADD     :   "+" >           }
+TOKEN : { < SUB     :   "-" >           }
+TOKEN : { < LPAR    :   "(" >           }
+TOKEN : { < RPAR    :   ")" >           }
+TOKEN : { < EQUAL   :   "=" >           }
+TOKEN : { < CEQ     :   "==" >          }
+TOKEN : { < CNE     :   "!=" >          }
+TOKEN : { < CLE     :   "<" >           }
+TOKEN : { < CRE     :   " >" >          }
+TOKEN : { < LEQ     :   "<=" >          }
+TOKEN : { < GEQ     :   " >=" >         }
+TOKEN : { < LBRACE  :   "{" >           }
+TOKEN : { < RBRACE  :   "}" >           }
+TOKEN : { < PER     :   "%" >           }
+TOKEN : { < BANG    :   "!" >           }
+TOKEN : { < OR      :   "||" >          }
+TOKEN : { < VBAR    :   "|" >           }
+TOKEN : { < COLON   :   ":" >           }
+TOKEN : { < SCOLON  :   ";" >           }
+TOKEN : { < DOT     :   "." >           }
+TOKEN : { < COMMA   :   "," >           }
+TOKEN : { < LSBRACE :   "[" >           }
+TOKEN : { < RSBRACE :   "]" >           }
+TOKEN : { < AND     :   "&&" >          }
+TOKEN : { < FUNC    :   "func" >        }
+TOKEN : { < INT     :   "int" >         }
+TOKEN : { < CHAR    :   "char" >        }
+TOKEN : { < BOOL    :   "bool" >        }
+TOKEN : { < ARRAY   :   "array of" >    }
+TOKEN : { < RECORD  :   "record of" >   }
+TOKEN : { < END     :   "end" >         }
+TOKEN : { < VAR     :   "var" >         }
+TOKEN : { < RETURN  :   "return" >      }
+TOKEN : { < WRITE   :   "write" >       }
+TOKEN : { < ALLOC   :   "allocate" >    }
+TOKEN : { < IF      :   "if" >          }
+TOKEN : { < THEN    :   "then" >        }
+TOKEN : { < WHILE   :   "while" >       }
+TOKEN : { < DO      :   "do" >          }
+TOKEN : { < LENGTH  :   "of length" >   }
+TOKEN : { < ELSE    :   "else" >        }
+TOKEN : { < TRUE    :   "true" >        }
+TOKEN : { < FALSE   :   "false" >       }
+TOKEN : { < NULL    :   "null" >        }
+TOKEN : { < TYPE    :   "type" >        }
+
+/*
+ * Rules
+ */
+
+int sum() :
+{
+    Token t;
+    int i;
+    int value;
+}
+{
+    t = <NUMBER>
+    {
+        i = Integer.parseInt(t.image);
+        value = i;
+    }
+    (
+        <ADD>
+        t = <NUMBER>
+        {
+            i = Integer.parseInt(t.image);
+            value += i;
+        }
+    )*
+    <EOF>
+    { return value; }
+}
