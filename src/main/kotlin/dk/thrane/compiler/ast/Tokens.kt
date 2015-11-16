@@ -51,7 +51,7 @@ enum class Tokens {
     T_NULL("null"),
     T_TYPE("type"),
     T_ID("[a-zA-Z_][a-zA-Z0-9_]*"),
-    T_WHITESPACE(" +");
+    T_WHITESPACE("[ \\n\\t]+");
 
     var regex: Pattern? = null
 
