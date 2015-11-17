@@ -16,10 +16,10 @@ class ParserSpec {
         """
 
         val result = parser.parse(source)
-        assertEquals(result.size, 1, "One function should be present")
-        assertEquals(result[0].head.name, "foobar", "Name of function should be foobar")
-        assertEquals(result[0].head.parameters.size, 0, "There should be no parameters present")
-        assertEquals(result[0].head.name, result[0].tail.name, "Head and tail identifier should match")
+        assertEquals(result.functions.size, 1, "One function should be present")
+        assertEquals(result.functions[0].head.name, "foobar", "Name of function should be foobar")
+        assertEquals(result.functions[0].head.parameters.size, 0, "There should be no parameters present")
+        assertEquals(result.functions[0].head.name, result.functions[0].tail.name, "Head and tail identifier should match")
     }
 
     @Test
@@ -32,11 +32,11 @@ class ParserSpec {
         """
 
         val result = parser.parse(source)
-        val head = result[0].head
-        val tail = result[0].tail
+        val head = result.functions[0].head
+        val tail = result.functions[0].tail
 
         // Check basic function characteristics
-        assertEquals(result.size, 1, "One functino should be present")
+        assertEquals(result.functions.size, 1, "One functino should be present")
         assertEquals(head.name, "foobar", "Name of function should be foobar")
         assertEquals(head.parameters.size, 7, "Seven parameters should be present")
         assertEquals(head.parameters.map { it.name }, listOf("a", "b", "c", "d", "e", "f", "g"),

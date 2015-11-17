@@ -4,9 +4,9 @@ import dk.thrane.compiler.ast.Tokens.*
 import java.util.*
 
 class Parser() {
-    fun parse(source: String): List<FunctionNode> {
+    fun parse(source: String): SourceFileNode {
         var cursor = Cursor(source)
-        return program(cursor)
+        return SourceFileNode(0, program(cursor))
     }
 
     private fun program(cursor: Cursor): List<FunctionNode> {

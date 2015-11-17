@@ -1,0 +1,5 @@
+func foobar(a: int, b: bool, c: char, d: array of int, e: array of array of bool,
+            f: record of {a: array of int}, g: array of record of {a: int})
+    a = 20;
+    write a;
+end foobar2
