@@ -4,16 +4,9 @@ import dk.thrane.compiler.ast.Tokens.*
 import java.util.*
 
 class Parser() {
-    fun parse() {
-        val source = """func                 thisIsAFuncIdentifier (  test: int, test2: array of record of {test2: array of int}    )
-            var a:int,b:bool,c:char;
-            var another:bool, anArray: array of int;
-            write anArray[a];
-            return false;
-        end thisIsAFuncIdentifier"""
+    fun parse(source: String): List<FunctionNode> {
         var cursor = Cursor(source)
-
-        program(cursor).forEach { println(it) }
+        return program(cursor)
     }
 
     private fun program(cursor: Cursor): List<FunctionNode> {
@@ -336,8 +329,4 @@ class Parser() {
             else -> return null
         }
     }
-}
-
-fun main(args: Array<String>) {
-    Parser().parse()
 }
