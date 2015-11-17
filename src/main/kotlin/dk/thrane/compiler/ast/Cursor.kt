@@ -2,8 +2,10 @@ package dk.thrane.compiler.ast
 
 class Cursor(val source: String) {
     private var idx: Int = 0
-    var lineNumber: Int = 0
+    var lineNumber: Int = 1
         private set
+    val empty: Boolean
+        get() = idx >= source.length
 
     val remainingString: String
         get() = source.substring(idx)

@@ -13,7 +13,15 @@ class Parser() {
         end thisIsAFuncIdentifier"""
         var cursor = Cursor(source)
 
-        println(function(cursor))
+        program(cursor).forEach { println(it) }
+    }
+
+    private fun program(cursor: Cursor): List<FunctionNode> {
+        val result = ArrayList<FunctionNode>()
+        while (!cursor.empty) {
+            result.add(function(cursor))
+        }
+        return result
     }
 
     private fun function(cursor: Cursor): FunctionNode {
@@ -40,6 +48,7 @@ class Parser() {
     private fun functionBody(cursor: Cursor): FunctionBody {
         val lineNumber = cursor.lineNumber
         val declarations = ArrayList<DeclarationNode>()
+        val statements = ArrayList<StatementNode>()
 
         outer@while (true) {
             val next = Tokens.nextToken(cursor, false)
@@ -48,7 +57,10 @@ class Parser() {
                 else -> break@outer
             }
         }
-        return FunctionBody(lineNumber, declarations)
+        while (Tokens.nextToken(cursor, false).tokenType != T_END) {
+            statements.add(statement(cursor))
+        }
+        return FunctionBody(lineNumber, declarations, statements)
     }
 
     private fun variableDeclarationList(cursor: Cursor, list: MutableList<FieldDeclarationNode>) {
@@ -156,6 +168,7 @@ class Parser() {
                 val peek = Tokens.nextToken(cursor, false)
                 var elseStatement: StatementNode? = null
                 if (peek.tokenType == T_ELSE) {
+                    Tokens.consume(T_ELSE, cursor)
                     elseStatement = statement(cursor)
                 }
                 return IfNode(lineNumber, expr, statement, elseStatement)
@@ -201,8 +214,37 @@ class Parser() {
     }
 
     private fun expression(cursor: Cursor): ExpressionNode {
+        val lineNumber = cursor.lineNumber
+        val left = TermExpressionNode(lineNumber, term(cursor))
+        val combined = expressionRecursion(cursor, left)
+        return combined ?: left
+    }
 
-        return ExpressionNode(0)
+    private fun expressionRecursion(cursor: Cursor, left: ExpressionNode): ExpressionNode? {
+        val next = Tokens.nextToken(cursor, false)
+        val lineNumber = cursor.lineNumber
+        when (next.tokenType) {
+            T_MULT, T_DIV, T_ADD, T_SUB, T_CEQ, T_CNE, T_CLE, T_CRE, T_LEQ, T_GEQ, T_AND, T_OR, T_PER -> {
+                Tokens.nextToken(cursor)
+                return BinaryExpressionNode(lineNumber, left, expression(cursor), next.tokenType)
+            }
+            else -> {
+                // Something else, we can't know here if it is legal or not
+                return null
+            }
+        }
+    }
+
+    private fun expressionList(cursor: Cursor): List<ExpressionNode> {
+        val list = ArrayList<ExpressionNode>()
+        if (!termLookahead(cursor)) return emptyList() // All expressions must start with a term
+        while (true) {
+            list.add(expression(cursor))
+            if (Tokens.optionallyConsume(T_COMMA, cursor) == null) {
+                break
+            }
+        }
+        return list
     }
 
     private fun term(cursor: Cursor): TermNode {
@@ -214,9 +256,9 @@ class Parser() {
                     T_LPAR -> {
                         val id = Tokens.consume(T_ID, cursor)
                         Tokens.consume(T_LPAR, cursor)
-                        // Expression list
+                        val arguments = expressionList(cursor)
                         Tokens.consume(T_RPAR, cursor)
-                        return FunctionCallNode(lineNumber, id.image, emptyList())
+                        return FunctionCallNode(lineNumber, id.image, arguments)
                     }
                     else -> {
                         return VariableTermNode(lineNumber, variable(cursor))
@@ -263,26 +305,35 @@ class Parser() {
         }
     }
 
-    private fun variable(cursor: Cursor): VariableNode {
-        val id = Tokens.consume(T_ID, cursor)
-        return variableRecursion(cursor, id.image)
+    private fun termLookahead(cursor: Cursor): Boolean {
+        val next = Tokens.nextToken(cursor, false)
+        when (next.tokenType) {
+            T_ID, T_LPAR, T_BANG, T_VBAR, T_NUM, T_TRUE, T_FALSE, T_NULL -> return true
+            else -> return false
+        }
     }
 
-    private fun variableRecursion(cursor: Cursor, identifier: String): VariableNode {
-        val next = Tokens.nextToken(cursor)
+    private fun variable(cursor: Cursor): VariableNode {
+        val access = VariableAccessNode(cursor.lineNumber, Tokens.consume(T_ID, cursor).image)
+        return variableRecursion(cursor, access) ?: access
+    }
+
+    private fun variableRecursion(cursor: Cursor, variableAccessNode: VariableAccessNode): VariableNode? {
+        val next = Tokens.nextToken(cursor, false)
         val lineNumber = cursor.lineNumber
         when (next.tokenType) {
             T_LSBRACE -> {
+                Tokens.consume(T_LSBRACE, cursor)
                 val expr = expression(cursor)
                 Tokens.consume(T_RSBRACE, cursor)
-                return ArrayAccessNode(lineNumber, identifier, expr)
+                return ArrayAccessNode(lineNumber, variableAccessNode, expr)
             }
             T_DOT -> {
+                Tokens.consume(T_DOT, cursor)
                 val id = Tokens.consume(T_ID, cursor)
-                return FieldAccessNode(lineNumber, identifier, id.image)
+                return FieldAccessNode(lineNumber, variableAccessNode, id.image)
             }
-            else -> throw IllegalStateException("Unexpected token while parsing variable, got ${next.tokenType}. " +
-                    "At line ${cursor.lineNumber}")
+            else -> return null
         }
     }
 }
