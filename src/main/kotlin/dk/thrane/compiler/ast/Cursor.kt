@@ -12,4 +12,9 @@ class Cursor(val source: String) {
         lineNumber += source.substring(idx, idx + count).map { if (it == '\n') 1 else 0 }.sum()
         idx += count
     }
+
+    fun withdraw(count: Int) {
+        lineNumber -= source.substring(idx - count, idx).map { if (it == '\n') 1 else 0 }.sum()
+        idx -= count
+    }
 }

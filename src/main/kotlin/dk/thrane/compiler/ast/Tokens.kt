@@ -50,13 +50,13 @@ enum class Tokens {
     T_FALSE("false"),
     T_NULL("null"),
     T_TYPE("type"),
+    T_NUM("0|([1-9][0-9]*)"),
     T_ID("[a-zA-Z_][a-zA-Z0-9_]*"),
     T_WHITESPACE("[ \\n\\t]+");
 
     var regex: Pattern? = null
 
-    constructor() {
-    }
+    constructor() {}
 
     constructor(regex: String) {
         this.regex = Pattern.compile(regex)
@@ -71,6 +71,12 @@ enum class Tokens {
         fun consume(type: Tokens, cursor: Cursor): Token {
             return optionallyConsume(type, cursor) ?: throw IllegalStateException("Syntax error at " +
                     "'${cursor.remainingString}' expected token $type!")
+        }
+
+        fun peek(cursor: Cursor, count: Int): List<Token> {
+            val tokens = (1..count).map { nextToken(cursor) }
+            cursor.withdraw(tokens.map { it.size }.sum())
+            return tokens
         }
 
         fun nextToken(cursor: Cursor, eat: Boolean = true): Token {
