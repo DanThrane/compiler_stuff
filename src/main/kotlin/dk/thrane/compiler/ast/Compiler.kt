@@ -13,6 +13,21 @@ class TestVisitor : Visitor() {
     }
 }
 
+class FunctionFix : Visitor() {
+    override fun enterNode(node: Node) {
+        when (node) {
+            is FunctionNode -> {
+                node.tail.name = node.head.name
+            }
+        }
+    }
+
+    override fun exitNode(node: Node) {
+        // Let children be a getter, make fully mutable
+    }
+
+}
+
 class FunctionCheck : Visitor() {
     override fun enterNode(node: Node) {
         when (node) {
