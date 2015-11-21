@@ -228,9 +228,9 @@ class Parser() {
         }
     }
 
-    private fun expressionList(cursor: Cursor): List<ExpressionNode> {
+    private fun expressionList(cursor: Cursor): MutableList<ExpressionNode> {
         val list = ArrayList<ExpressionNode>()
-        if (!termLookahead(cursor)) return emptyList() // All expressions must start with a term
+        if (!termLookahead(cursor)) return ArrayList() // All expressions must start with a term
         while (true) {
             list.add(expression(cursor))
             if (Tokens.optionallyConsume(T_COMMA, cursor) == null) {

@@ -1,12 +1,12 @@
 package dk.thrane.compiler.ast
 
-open class TypeNode(override val lineNumber: Int, val type: Tokens) : Node {
+open class TypeNode(override var lineNumber: Int, var type: Tokens) : Node {
     override fun toString(): String {
         return type.toString()
     }
 }
 
-class RecordTypeNode(lineNumber: Int, val fields: List<FieldDeclarationNode>) : TypeNode(lineNumber, Tokens.T_RECORD) {
+class RecordTypeNode(lineNumber: Int, var fields: MutableList<FieldDeclarationNode>) : TypeNode(lineNumber, Tokens.T_RECORD) {
     override val children = fields
 
     override fun toString(): String {
@@ -23,7 +23,7 @@ class RecordTypeNode(lineNumber: Int, val fields: List<FieldDeclarationNode>) : 
     }
 }
 
-class ArrayTypeNode(lineNumber: Int, val arrayType: TypeNode) : TypeNode(lineNumber, Tokens.T_ARRAY) {
+class ArrayTypeNode(lineNumber: Int, var arrayType: TypeNode) : TypeNode(lineNumber, Tokens.T_ARRAY) {
     override val children = listOf(arrayType)
 
     override fun toString(): String {

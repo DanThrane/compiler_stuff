@@ -7,12 +7,12 @@ data class FunctionNode(override var lineNumber: Int, var head: FunctionHead, va
 }
 
 data class FunctionHead(override var lineNumber: Int, var name: String,
-                        var parameters: List<FieldDeclarationNode>) : Node {
+                        var parameters: MutableList<FieldDeclarationNode>) : Node {
     override val children: List<Node>
         get() = parameters
 }
 data class FunctionBody(override var lineNumber: Int, var declarations: List<DeclarationNode>,
-                        var statements: List<StatementNode>) : Node {
+                        var statements: MutableList<StatementNode>) : Node {
     override val children: List<Node>
         get() = statements
 }

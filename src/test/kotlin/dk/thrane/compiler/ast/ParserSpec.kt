@@ -33,7 +33,6 @@ class ParserSpec {
 
         val result = parser.parse(source)
         val head = result.functions[0].head
-        val tail = result.functions[0].tail
 
         // Check basic function characteristics
         assertEquals(result.functions.size, 1, "One functino should be present")
@@ -84,6 +83,7 @@ class ParserSpec {
                         if (type is Map<*, *>) {
                             assertEquals(type.size, current.fields.size, "Not enough fields in record ($name)")
                             for (field in current.fields) {
+                                @Suppress("UNCHECKED_CAST")
                                 requireType(field.type, type.getRaw(field.name) as List<Any>, name)
                             }
                         } else {

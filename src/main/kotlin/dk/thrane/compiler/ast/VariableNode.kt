@@ -1,15 +1,15 @@
 package dk.thrane.compiler.ast
 
-open class VariableNode(override val lineNumber: Int) : Node
+open class VariableNode(override var lineNumber: Int) : Node
 
-class VariableAccessNode(lineNumber: Int, val identifier: String) : VariableNode(lineNumber)
+class VariableAccessNode(lineNumber: Int, var identifier: String) : VariableNode(lineNumber)
 
-class ArrayAccessNode(lineNumber: Int, val variableAccessNode: VariableAccessNode, val expressionNode: ExpressionNode):
+class ArrayAccessNode(lineNumber: Int, var variableAccessNode: VariableAccessNode, var expressionNode: ExpressionNode):
         VariableNode(lineNumber) {
     override val children = listOf(variableAccessNode, expressionNode)
 }
 
-class FieldAccessNode(lineNumber: Int, val variableAccessNode: VariableAccessNode, val fieldName: String) :
+class FieldAccessNode(lineNumber: Int, var variableAccessNode: VariableAccessNode, var fieldName: String) :
         VariableNode(lineNumber) {
     override val children = listOf(variableAccessNode)
 }

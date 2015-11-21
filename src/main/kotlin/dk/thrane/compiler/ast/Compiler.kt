@@ -49,11 +49,13 @@ fun main(args: Array<String>) {
 
     val source = Files.readAllLines(Paths.get("./programs", "hello.die")).joinToString("\n")
     val parser = Parser()
+    val functionFix = FunctionFix()
     val functionChecker = FunctionCheck()
     val printer = TestVisitor()
 
     val ast = parser.parse(source)
     printer.traverse(ast)
+    functionFix.traverse(ast)
     functionChecker.traverse(ast)
 }
 
