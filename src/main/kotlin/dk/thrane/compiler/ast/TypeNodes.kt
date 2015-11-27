@@ -1,10 +1,12 @@
 package dk.thrane.compiler.ast
 
-open class TypeNode(override var lineNumber: Int, var type: Tokens) : Node {
+open class TypeNode(override var lineNumber: Int, var type: Tokens) : Node() {
     override fun toString(): String {
         return type.toString()
     }
 }
+
+class IdentifierType(lineNumber: Int, val identifier: String) : TypeNode(lineNumber, Tokens.T_ID)
 
 class RecordTypeNode(lineNumber: Int, var fields: MutableList<FieldDeclarationNode>) : TypeNode(lineNumber, Tokens.T_RECORD) {
     override val children = fields

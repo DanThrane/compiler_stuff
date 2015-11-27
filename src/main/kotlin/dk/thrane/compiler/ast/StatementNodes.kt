@@ -1,6 +1,6 @@
 package dk.thrane.compiler.ast
 
-open class StatementNode(override var lineNumber: Int) : Node
+open class StatementNode(override var lineNumber: Int) : Node()
 
 class ReturnNode(lineNumber: Int, var expression: ExpressionNode) : StatementNode(lineNumber) {
     override val children = listOf(expression)

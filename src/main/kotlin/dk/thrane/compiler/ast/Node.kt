@@ -1,7 +1,10 @@
 package dk.thrane.compiler.ast
 
-interface Node {
-    val lineNumber: Int
-    val children: List<Node>
+import dk.thrane.compiler.type.SymbolTable
+
+abstract class Node {
+    abstract val lineNumber: Int
+    var scope: SymbolTable? = null
+    open val children: List<Node>
         get() = emptyList()
 }

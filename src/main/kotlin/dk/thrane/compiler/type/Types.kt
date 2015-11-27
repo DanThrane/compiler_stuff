@@ -1,5 +1,10 @@
 package dk.thrane.compiler.type
 
+import dk.thrane.compiler.ast.ArrayTypeNode
+import dk.thrane.compiler.ast.IdentifierType
+import dk.thrane.compiler.ast.RecordTypeNode
+import dk.thrane.compiler.ast.Tokens.*
+import dk.thrane.compiler.ast.TypeNode
 import java.util.*
 
 open class Type {
@@ -12,7 +17,7 @@ open class Type {
 
             when (currentLeft) {
                 is TypeInt, is TypeBool, is TypeChar -> return currentLeft.javaClass == currentRight.javaClass
-                is TypeNull, is TypeFunction, is TypeTypedef, is TypeUnresolved -> return false
+                is TypeNull, is TypeFunction, is TypeTypedef, is TypeUnresolved, is TypeUnit -> return false
                 is TypeLike -> {
                     if (currentRight is TypeLike) {
                         if (currentLeft.type == currentRight.type) {
@@ -57,6 +62,23 @@ open class Type {
             }
             return currentType
         }
+
+        fun fromASTType(node: TypeNode): Type {
+            when (node) {
+                is IdentifierType -> return TypeUnresolved(node.identifier)
+                is ArrayTypeNode -> return TypeArray(fromASTType(node.arrayType))
+                is RecordTypeNode -> return TypeRecord(node.fields.map { Pair(it.name, fromASTType(it.type)) })
+                is TypeNode -> {
+                    when (node.type) {
+                        T_INT -> return TypeInt()
+                        T_BOOL -> return TypeBool()
+                        T_CHAR -> return TypeChar()
+                        else -> {}
+                    }
+                }
+            }
+            throw IllegalArgumentException("Unable to convert $node to native type!")
+        }
     }
 }
 
@@ -64,6 +86,7 @@ class TypeInt : Type()
 class TypeBool : Type()
 class TypeChar : Type()
 class TypeNull : Type()
+class TypeUnit : Type()
 class TypeRecord(val fieldTypes: List<Pair<String, Type>>) : Type()
 class TypeArray(val type: Type): Type()
 class TypeFunction(val parameterTypes: List<Pair<String, Type>>) : Type()

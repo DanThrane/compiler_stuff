@@ -1,6 +1,6 @@
 package dk.thrane.compiler.ast
 
-open class VariableNode(override var lineNumber: Int) : Node
+open class VariableNode(override var lineNumber: Int) : Node()
 
 class VariableAccessNode(lineNumber: Int, var identifier: String) : VariableNode(lineNumber)
 

@@ -1,6 +1,6 @@
 package dk.thrane.compiler.ast
 
-open class ExpressionNode(override var lineNumber: Int) : Node
+open class ExpressionNode(override var lineNumber: Int) : Node()
 abstract class BinaryExpressionNode(lineNumber: Int, var left: ExpressionNode, var right: ExpressionNode, var operator: Tokens) :
         ExpressionNode(lineNumber) {
     override val children = listOf(left, right)

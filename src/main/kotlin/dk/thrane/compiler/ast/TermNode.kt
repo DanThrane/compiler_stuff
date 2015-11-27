@@ -1,6 +1,6 @@
 package dk.thrane.compiler.ast
 
-open class TermNode(override var lineNumber: Int) : Node
+open class TermNode(override var lineNumber: Int) : Node()
 
 class VariableTermNode(lineNumber: Int, var variableNode: VariableNode) : TermNode(lineNumber) {
     override val children = listOf(variableNode)

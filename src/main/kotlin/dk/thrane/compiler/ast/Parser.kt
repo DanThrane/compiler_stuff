@@ -35,7 +35,9 @@ class Parser() {
         variableDeclarationList(cursor, parameters)
         Tokens.consume(T_RIGHT_PARENTHESIS, cursor)
 
-        return FunctionHead(lineNumber, id.image, parameters)
+        val hasType = Tokens.optionallyConsume(Tokens.T_COLON, cursor) != null
+        val type = if (hasType) type(cursor) else null
+        return FunctionHead(lineNumber, id.image, parameters, type)
     }
 
     private fun functionBody(cursor: Cursor): FunctionBody {
@@ -77,7 +79,8 @@ class Parser() {
         var next = Tokens.nextToken(cursor)
         val lineNumber = cursor.lineNumber
         when (next.tokenType) {
-            T_ID, T_INT, T_BOOL, T_CHAR -> return TypeNode(lineNumber, next.tokenType)
+            T_INT, T_BOOL, T_CHAR -> return TypeNode(lineNumber, next.tokenType)
+            T_ID -> return IdentifierType(lineNumber, ((next.value as String?)!!))
             T_ARRAY -> return ArrayTypeNode(lineNumber, type(cursor))
             T_RECORD -> {
                 val fields = ArrayList<FieldDeclarationNode>()
@@ -118,7 +121,6 @@ class Parser() {
                 Tokens.consume(T_SEMI_COLON, cursor)
                 return VariableDeclarationNode(lineNumber, variables)
             }
-            T_FUNCTION -> return FunctionDeclarationNode(lineNumber, function(cursor))
             else -> throw IllegalStateException("Unexpected token ${next.tokenType}. Expected one of, $T_TYPE, " +
                     "$T_VAR, $T_FUNCTION. At line ${cursor.lineNumber}")
         }

@@ -4,6 +4,7 @@ import java.nio.file.Files
 import java.nio.file.Paths
 
 import dk.thrane.compiler.ast.Tokens.*
+import dk.thrane.compiler.type.SymbolGatherer
 
 class TestVisitor : Visitor() {
     var indent: Int = 0
@@ -61,8 +62,10 @@ fun main(args: Array<String>) {
     val functionFix = FunctionFix()
     val functionChecker = FunctionCheck()
     val printer = TestVisitor()
+    val gatherer = SymbolGatherer()
 
     val ast = parser.parse(source)
+    gatherer.traverse(ast)
     printer.traverse(ast)
     functionFix.traverse(ast)
     functionChecker.traverse(ast)
