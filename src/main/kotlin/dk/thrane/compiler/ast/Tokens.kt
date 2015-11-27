@@ -3,33 +3,33 @@ package dk.thrane.compiler.ast
 import java.util.regex.Pattern
 
 enum class Tokens {
-    T_MULT("\\*"),
-    T_DIV("/"),
+    T_MULTIPLICATION("\\*"),
+    T_DIVISION("/"),
     T_ADD("\\+"),
-    T_SUB("-"),
-    T_LPAR("\\("),
-    T_RPAR("\\)"),
-    T_EQUAL("="),
-    T_CEQ("=="),
-    T_CNE("!="),
-    T_CLE("<"),
-    T_CRE(">"),
-    T_LEQ("<="),
-    T_GEQ(">="),
-    T_LBRACE("\\{"),
-    T_RBRACE("\\}"),
-    T_PER("%"),
+    T_SUBTRACTION("-"),
+    T_LEFT_PARENTHESIS("\\("),
+    T_RIGHT_PARENTHESIS("\\)"),
+    T_ASSIGNMENT("="),
+    T_COMPARE_EQUALS("=="),
+    T_COMPARE_NOT_EQUALS("!="),
+    T_COMPARE_LESS_THAN("<"),
+    T_COMPARE_GREATER_THAN(">"),
+    T_COMPARE_LESS_THAN_OR_EQUALS("<="),
+    T_COMPARE_GREATER_THAN_OR_EQUALS(">="),
+    T_LEFT_CURLY_BRACE("\\{"),
+    T_RIGHT_CURLY_BRACE("\\}"),
+    T_PERCENT_SIGN("%"),
     T_BANG("!"),
     T_OR("||"),
-    T_VBAR("|"),
+    T_VERTICAL_BAR("|"),
     T_COLON(":"),
-    T_SCOLON(";"),
+    T_SEMI_COLON(";"),
     T_DOT("\\."),
     T_COMMA(","),
-    T_LSBRACE("\\["),
-    T_RSBRACE("\\]"),
+    T_LEFT_SQUARE_BRACE("\\["),
+    T_RIGHT_SQUARE_BRACE("\\]"),
     T_AND("&&"),
-    T_FUNC("func"),
+    T_FUNCTION("func"),
     T_INT("int"),
     T_CHAR("char"),
     T_BOOL("bool"),
@@ -74,8 +74,9 @@ enum class Tokens {
         }
 
         fun peek(cursor: Cursor, count: Int): List<Token> {
+            val start = cursor.idx
             val tokens = (1..count).map { nextToken(cursor) }
-            cursor.withdraw(tokens.map { it.size }.sum())
+            cursor.idx = start
             return tokens
         }
 

@@ -3,7 +3,7 @@ package dk.thrane.compiler.ast
 import kotlin.text.Regex
 
 class Cursor(val source: String) {
-    private var idx: Int = 0
+    var idx: Int = 0
     var lineNumber: Int = 1
         private set
     val empty: Boolean

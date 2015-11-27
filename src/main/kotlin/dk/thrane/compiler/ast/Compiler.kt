@@ -3,13 +3,22 @@ package dk.thrane.compiler.ast
 import java.nio.file.Files
 import java.nio.file.Paths
 
+import dk.thrane.compiler.ast.Tokens.*
+
 class TestVisitor : Visitor() {
+    var indent: Int = 0
     override fun enterNode(node: Node) {
-        println("Entering ${node.javaClass.name}")
+        var indention = CharArray(indent)
+        indention.fill(' ')
+        println("${String(indention)}Entering ${node.javaClass.name}")
+        indent += 2
     }
 
     override fun exitNode(node: Node) {
-        println("Exiting ${node.javaClass.name}")
+        indent -= 2
+        var indention = CharArray(indent)
+        indention.fill(' ')
+        println("${String(indention)}Exiting ${node.javaClass.name}")
     }
 }
 
@@ -25,7 +34,6 @@ class FunctionFix : Visitor() {
     override fun exitNode(node: Node) {
         // Let children be a getter, make fully mutable
     }
-
 }
 
 class FunctionCheck : Visitor() {
@@ -41,13 +49,14 @@ class FunctionCheck : Visitor() {
         }
     }
 
-    override fun exitNode(node: Node) {}
+    override fun exitNode(node: Node) {
+    }
 }
 
 fun main(args: Array<String>) {
     println("Hello!")
 
-    val source = Files.readAllLines(Paths.get("./programs", "hello.die")).joinToString("\n")
+    val source = Files.readAllLines(Paths.get("./programs", "operators.die")).joinToString("\n")
     val parser = Parser()
     val functionFix = FunctionFix()
     val functionChecker = FunctionCheck()

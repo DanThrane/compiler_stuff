@@ -12,7 +12,7 @@ abstract class Visitor {
                 traverse(child)
             }
         }
-        visitChildren = false
+        visitChildren = true
         exitNode(root)
     }
 }
