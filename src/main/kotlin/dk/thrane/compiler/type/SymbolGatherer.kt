@@ -18,24 +18,23 @@ class SymbolGatherer : Visitor() {
         node.scope = currentScope
         when (node) {
             is TypeDeclarationNode -> {
-                currentScope.putSymbol(node.name, Type.fromASTType(node.typeNode))
+                currentScope.putSymbol(node.name, node.typeNode.toNativeType())
             }
             is FunctionNode -> {
-                val type = if (node.head.type != null) Type.fromASTType(node.head.type!!)
-                           else TypeUnit()
-                currentScope.putSymbol(node.head.name, type)
                 enterScope()
+                val type = if (node.head.type != null) node.head.type!!.toNativeType()
+                           else TypeUnit()
+                currentScope.putSymbol("#return", type)
             }
             is VariableDeclarationNode -> {
                 node.variables.forEach {
-                    currentScope.putSymbol(it.name, Type.fromASTType(it.type))
+                    currentScope.putSymbol(it.name, it.type.toNativeType())
                 }
             }
             is FieldDeclarationNode -> {
-                currentScope.putSymbol(node.name, Type.fromASTType(node.type))
+                currentScope.putSymbol(node.name, node.type.toNativeType())
             }
             is RecordTypeNode -> {
-                println("Entering")
                 enterScope()
             }
         }
@@ -44,7 +43,6 @@ class SymbolGatherer : Visitor() {
     override fun exitNode(node: Node) {
         when (node) {
             is FunctionNode, is RecordTypeNode -> {
-                println("Exiting")
                 exitScope()
             }
         }

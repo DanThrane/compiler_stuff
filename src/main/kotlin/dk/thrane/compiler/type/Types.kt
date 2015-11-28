@@ -63,22 +63,6 @@ open class Type {
             return currentType
         }
 
-        fun fromASTType(node: TypeNode): Type {
-            when (node) {
-                is IdentifierType -> return TypeUnresolved(node.identifier)
-                is ArrayTypeNode -> return TypeArray(fromASTType(node.arrayType))
-                is RecordTypeNode -> return TypeRecord(node.fields.map { Pair(it.name, fromASTType(it.type)) })
-                is TypeNode -> {
-                    when (node.type) {
-                        T_INT -> return TypeInt()
-                        T_BOOL -> return TypeBool()
-                        T_CHAR -> return TypeChar()
-                        else -> {}
-                    }
-                }
-            }
-            throw IllegalArgumentException("Unable to convert $node to native type!")
-        }
     }
 }
 

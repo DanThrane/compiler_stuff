@@ -1,14 +1,29 @@
 package dk.thrane.compiler.ast
 
+import dk.thrane.compiler.type.*
+
 open class TypeNode(override var lineNumber: Int, var type: Tokens) : Node() {
     override fun toString(): String {
         return type.toString()
     }
+
+    open fun toNativeType(): Type {
+        when (type) {
+            Tokens.T_INT -> return TypeInt()
+            Tokens.T_BOOL -> return TypeBool()
+            Tokens.T_CHAR -> return TypeChar()
+            else -> throw IllegalStateException("Unknown token type ($type)!")
+        }
+    }
 }
 
-class IdentifierType(lineNumber: Int, val identifier: String) : TypeNode(lineNumber, Tokens.T_ID)
+class IdentifierType(lineNumber: Int, val identifier: String) : TypeNode(lineNumber, Tokens.T_ID) {
+    override fun toNativeType(): Type = TypeUnresolved(identifier)
+}
 
 class RecordTypeNode(lineNumber: Int, var fields: MutableList<FieldDeclarationNode>) : TypeNode(lineNumber, Tokens.T_RECORD) {
+    override fun toNativeType(): Type = TypeRecord(fields.map { Pair(it.name, it.type.toNativeType()) })
+
     override val children = fields
 
     override fun toString(): String {
@@ -26,6 +41,8 @@ class RecordTypeNode(lineNumber: Int, var fields: MutableList<FieldDeclarationNo
 }
 
 class ArrayTypeNode(lineNumber: Int, var arrayType: TypeNode) : TypeNode(lineNumber, Tokens.T_ARRAY) {
+    override fun toNativeType(): Type = TypeArray(arrayType.toNativeType())
+
     override val children = listOf(arrayType)
 
     override fun toString(): String {
