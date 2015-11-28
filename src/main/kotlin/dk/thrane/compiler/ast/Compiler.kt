@@ -5,6 +5,7 @@ import java.nio.file.Paths
 
 import dk.thrane.compiler.ast.Tokens.*
 import dk.thrane.compiler.type.SymbolGatherer
+import dk.thrane.compiler.type.TypeChecker
 
 class TestVisitor : Visitor() {
     var indent: Int = 0
@@ -63,11 +64,14 @@ fun main(args: Array<String>) {
     val functionChecker = FunctionCheck()
     val printer = TestVisitor()
     val gatherer = SymbolGatherer()
+    val checker = TypeChecker()
 
     val ast = parser.parse(source)
     gatherer.traverse(ast)
-    printer.traverse(ast)
+//    printer.traverse(ast)
+    // FIXME NEEDS TO BE SUPPORTED a[0][1][2];
     functionFix.traverse(ast)
     functionChecker.traverse(ast)
+    checker.traverse(ast)
 }
 

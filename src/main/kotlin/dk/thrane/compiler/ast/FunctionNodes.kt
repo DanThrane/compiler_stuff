@@ -7,14 +7,14 @@ class FunctionNode(override var lineNumber: Int, var head: FunctionHead, var bod
 }
 
 class FunctionHead(override var lineNumber: Int, var name: String,
-                        var parameters: MutableList<FieldDeclarationNode>, val type: TypeNode?) : Node() {
+                        var parameters: MutableList<FieldDeclarationNode>, val typeNode: TypeNode?) : Node() {
     override val children: List<Node>
         get() = parameters
 }
 class FunctionBody(override var lineNumber: Int, var declarations: List<DeclarationNode>,
                         var statements: MutableList<StatementNode>) : Node() {
     override val children: List<Node>
-        get() = statements
+        get() = declarations + statements
 }
 
 class FunctionTail(override var lineNumber: Int, var name: String) : Node()

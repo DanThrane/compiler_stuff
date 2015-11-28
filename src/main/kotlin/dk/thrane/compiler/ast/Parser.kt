@@ -209,7 +209,6 @@ class Parser() {
     }
 
     private fun findOperator(token: Tokens): Operator? {
-        print(Operator.values)
         return Operator.values.find { it.token == token }
     }
 
@@ -224,7 +223,6 @@ class Parser() {
     private fun expressionRecursion(cursor: Cursor, left: ExpressionNode, minPrecedence: Int): ExpressionNode {
         val lineNumber = cursor.lineNumber
         var lookahead = Tokens.nextToken(cursor, false)
-        print(lookahead.tokenType)
         var op = findOperator(lookahead.tokenType)
         var result = left
 

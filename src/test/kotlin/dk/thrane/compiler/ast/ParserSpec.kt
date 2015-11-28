@@ -42,24 +42,24 @@ class ParserSpec {
                 "Parameters should have the correct names")
 
         // The the parameter types
-        assertEquals(head.parameters.map { it.type.type }, listOf(T_INT, T_BOOL, T_CHAR, T_ARRAY, T_ARRAY, T_RECORD,
+        assertEquals(head.parameters.map { it.typeNode }, listOf(T_INT, T_BOOL, T_CHAR, T_ARRAY, T_ARRAY, T_RECORD,
                 T_ARRAY))
-        assertTrue(head.parameters[0].type is TypeNode)
-        assertTrue(head.parameters[1].type is TypeNode)
-        assertTrue(head.parameters[2].type is TypeNode)
-        assertTrue(head.parameters[3].type is ArrayTypeNode)
-        assertTrue(head.parameters[4].type is ArrayTypeNode)
-        assertTrue(head.parameters[5].type is RecordTypeNode)
-        assertTrue(head.parameters[6].type is ArrayTypeNode)
+        assertTrue(head.parameters[0].typeNode is TypeNode)
+        assertTrue(head.parameters[1].typeNode is TypeNode)
+        assertTrue(head.parameters[2].typeNode is TypeNode)
+        assertTrue(head.parameters[3].typeNode is ArrayTypeNode)
+        assertTrue(head.parameters[4].typeNode is ArrayTypeNode)
+        assertTrue(head.parameters[5].typeNode is RecordTypeNode)
+        assertTrue(head.parameters[6].typeNode is ArrayTypeNode)
 
         // Check the inner parameter types
-        requireType(head.parameters[3].type, listOf(T_ARRAY, T_INT), "array of int")
-        requireType(head.parameters[4].type, listOf(T_ARRAY, T_ARRAY, T_BOOL), "array array of bool")
-        requireType(head.parameters[5].type, listOf(
+        requireType(head.parameters[3].typeNode, listOf(T_ARRAY, T_INT), "array of int")
+        requireType(head.parameters[4].typeNode, listOf(T_ARRAY, T_ARRAY, T_BOOL), "array array of bool")
+        requireType(head.parameters[5].typeNode, listOf(
                 T_RECORD,
                 mapOf(Pair("a", listOf(T_ARRAY, T_INT)))
         ), "record of (a: array of int)")
-        requireType(head.parameters[6].type, listOf(
+        requireType(head.parameters[6].typeNode, listOf(
                 T_ARRAY,
                 T_RECORD,
                 mapOf(Pair("a", listOf(T_INT)))
@@ -84,7 +84,7 @@ class ParserSpec {
                             assertEquals(type.size, current.fields.size, "Not enough fields in record ($name)")
                             for (field in current.fields) {
                                 @Suppress("UNCHECKED_CAST")
-                                requireType(field.type, type.getRaw(field.name) as List<Any>, name)
+                                requireType(field.typeNode, type.getRaw(field.name) as List<Any>, name)
                             }
                         } else {
                             assertTrue(false, "Error in type. Expected $type to be a map")

@@ -8,7 +8,7 @@ open class Type {
             var currentLeft = theLeft
             var currentRight = theRight
 
-            if (currentLeft !is TypeLike) currentRight = resolveLike(currentRight)
+            if (currentLeft !is TypeLike) currentRight = fullyResolve(currentRight)
 
             when (currentLeft) {
                 is TypeInt, is TypeBool, is TypeChar -> return currentLeft.javaClass == currentRight.javaClass
@@ -20,7 +20,7 @@ open class Type {
                         }
                         return false
                     }
-                    return checkCompatibility(resolveLike(currentLeft), currentRight)
+                    return checkCompatibility(fullyResolve(currentLeft), currentRight)
                 }
                 is TypeArray -> {
                     if (currentRight is TypeNull) return true
@@ -44,7 +44,7 @@ open class Type {
             return false
         }
 
-        fun resolveLike(type: Type): Type {
+        fun fullyResolve(type: Type): Type {
             val visited: MutableSet<Type> = HashSet()
             var currentType = type
 

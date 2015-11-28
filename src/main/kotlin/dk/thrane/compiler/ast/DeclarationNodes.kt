@@ -1,7 +1,7 @@
 package dk.thrane.compiler.ast
 
-class FieldDeclarationNode(override var lineNumber: Int, var name: String, var type: TypeNode) : Node() {
-    override val children = listOf(type)
+class FieldDeclarationNode(override var lineNumber: Int, var name: String, var typeNode: TypeNode) : Node() {
+    override val children = listOf(typeNode)
 }
 
 open class DeclarationNode(override var lineNumber: Int) : Node()

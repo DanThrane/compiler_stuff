@@ -1,3 +1,15 @@
-func foobar(a: int, b: bool, c: array of array of array of int)
+func test(): array of array of array of int
+    var a: array of array of array of int;
+    var i: int;
+    alloc a of length 1;
+    write foobar(i, false, a);
+    return a;
+end test
+
+func foobar(a: int, b: bool, c: array of array of array of int): int
     write ((1 + 2 * 3) * 4) / 5;
+    if (false) then {
+        write 2;
+    }
+    return 0;
 end foobar

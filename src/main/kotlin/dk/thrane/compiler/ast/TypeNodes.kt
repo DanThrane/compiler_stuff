@@ -2,13 +2,13 @@ package dk.thrane.compiler.ast
 
 import dk.thrane.compiler.type.*
 
-open class TypeNode(override var lineNumber: Int, var type: Tokens) : Node() {
+open class TypeNode(override var lineNumber: Int, var token: Tokens) : Node() {
     override fun toString(): String {
         return type.toString()
     }
 
     open fun toNativeType(): Type {
-        when (type) {
+        when (token) {
             Tokens.T_INT -> return TypeInt()
             Tokens.T_BOOL -> return TypeBool()
             Tokens.T_CHAR -> return TypeChar()
@@ -22,7 +22,7 @@ class IdentifierType(lineNumber: Int, val identifier: String) : TypeNode(lineNum
 }
 
 class RecordTypeNode(lineNumber: Int, var fields: MutableList<FieldDeclarationNode>) : TypeNode(lineNumber, Tokens.T_RECORD) {
-    override fun toNativeType(): Type = TypeRecord(fields.map { Pair(it.name, it.type.toNativeType()) })
+    override fun toNativeType(): Type = TypeRecord(fields.map { Pair(it.name, it.typeNode.toNativeType()) })
 
     override val children = fields
 

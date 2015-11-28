@@ -6,6 +6,7 @@ class SymbolTable {
     private val symbols: MutableMap<String, Symbol> = HashMap()
     var parent: SymbolTable? = null
         private set
+    var function: TypeFunction? = null
 
     fun putSymbol(name: String, type: Type) {
         symbols.put(name, Symbol(name, type))
@@ -20,6 +21,7 @@ class SymbolTable {
             if (symbol != null) {
                 return Pair(symbol, level)
             }
+            currentTable = currentTable.parent
             level++
         }
         return null
