@@ -1,10 +1,5 @@
 package dk.thrane.compiler.type
 
-import dk.thrane.compiler.ast.ArrayTypeNode
-import dk.thrane.compiler.ast.IdentifierType
-import dk.thrane.compiler.ast.RecordTypeNode
-import dk.thrane.compiler.ast.Tokens.*
-import dk.thrane.compiler.ast.TypeNode
 import java.util.*
 
 open class Type {
@@ -73,7 +68,7 @@ class TypeNull : Type()
 class TypeUnit : Type()
 class TypeRecord(val fieldTypes: List<Pair<String, Type>>) : Type()
 class TypeArray(val type: Type): Type()
-class TypeFunction(val parameterTypes: List<Pair<String, Type>>) : Type()
+class TypeFunction(val parameterTypes: List<Pair<String, Type>>, val returnType: Type) : Type()
 class TypeTypedef(val type: Type) : Type()
 class TypeUnresolved(val identifier: String) : Type()
 class TypeLike(val type: Type) : Type()
