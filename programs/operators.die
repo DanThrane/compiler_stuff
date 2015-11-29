@@ -3,7 +3,11 @@ func test(): array of array of array of int
     var i: int;
     alloc a of length 1;
     write foobar(i, false, a);
-    return a;
+    if (true) then {
+        return a;
+    } else {
+        return a;
+    }
 end test
 
 func foobar(a: int, b: bool, c: array of array of array of int): int
