@@ -5,7 +5,7 @@ import java.util.*
 class ClassFile {
     companion object {
         const val MAGIC = 0xCAFEBABE
-        const val MAJOR_VERSION = 0
+        const val MAJOR_VERSION = 52
         const val MINOR_VERSION = 0
     }
 

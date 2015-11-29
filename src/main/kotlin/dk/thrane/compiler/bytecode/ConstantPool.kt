@@ -175,4 +175,3 @@ class ConstantInvokeDynamicInfo(val bootstrapMethodAttributeIndex: Short, val na
         out.writeShort(nameAndType.index)
     }
 }
-
