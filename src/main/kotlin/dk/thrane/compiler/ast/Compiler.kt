@@ -8,37 +8,6 @@ import dk.thrane.compiler.type.SymbolGatherer
 import dk.thrane.compiler.type.TypeChecker
 import dk.thrane.compiler.weeder.ReturnCheck
 
-class TestVisitor : Visitor() {
-    var indent: Int = 0
-    override fun enterNode(node: Node) {
-        var indention = CharArray(indent)
-        indention.fill(' ')
-        println("${String(indention)}Entering ${node.javaClass.name}")
-        indent += 2
-    }
-
-    override fun exitNode(node: Node) {
-        indent -= 2
-        var indention = CharArray(indent)
-        indention.fill(' ')
-        println("${String(indention)}Exiting ${node.javaClass.name}")
-    }
-}
-
-class FunctionFix : Visitor() {
-    override fun enterNode(node: Node) {
-        when (node) {
-            is FunctionNode -> {
-                node.tail.name = node.head.name
-            }
-        }
-    }
-
-    override fun exitNode(node: Node) {
-        // Let children be a getter, make fully mutable
-    }
-}
-
 class FunctionCheck : Visitor() {
     override fun enterNode(node: Node) {
         when (node) {
@@ -61,18 +30,14 @@ fun main(args: Array<String>) {
 
     val source = Files.readAllLines(Paths.get("./programs", "operators.die")).joinToString("\n")
     val parser = Parser()
-    val functionFix = FunctionFix()
     val functionChecker = FunctionCheck()
-    val printer = TestVisitor()
     val gatherer = SymbolGatherer()
     val checker = TypeChecker()
     val returnCheck = ReturnCheck()
 
     val ast = parser.parse(source)
     gatherer.traverse(ast)
-//    printer.traverse(ast)
     // FIXME NEEDS TO BE SUPPORTED a[0][1][2];
-    functionFix.traverse(ast)
     functionChecker.traverse(ast)
     returnCheck.traverse(ast)
     checker.traverse(ast)
