@@ -1,13 +1,13 @@
 package dk.thrane.compiler.bytecode
 
+import dk.thrane.compiler.type.Type
 import java.io.DataOutputStream
-import java.nio.channels.Channels
-import java.nio.charset.Charset
 import java.util.*
 
 class ConstantPool {
     private val entries: MutableList<ConstantPoolEntry> = ArrayList()
     private var nextIndex: Int = 0
+    private val constants: MutableMap<Pair<String, Class<*>>, ConstantPoolEntry> = HashMap()
 
     fun write(out: DataOutputStream) {
         out.writeShort(nextIndex)
@@ -19,6 +19,33 @@ class ConstantPool {
         entry.pool = this
         entries.add(entry)
         nextIndex += entry.entries
+    }
+
+    private fun insertIntoCache(name: String, value: ConstantPoolEntry): ConstantPoolEntry {
+        constants[Pair(name, value.javaClass)] = value
+        return value
+    }
+
+    private fun createUTF8Entry(string: String): ConstantUtf8Info {
+        return (constants[Pair(string, ConstantUtf8Info::class.java)] ?:
+                insertIntoCache(string, ConstantUtf8Info(string))) as ConstantUtf8Info
+    }
+
+    private fun createClassEntry(string: String): ConstantClassInfo {
+        return (constants[Pair(string, ConstantClassInfo::class.java)] ?:
+                insertIntoCache(string, ConstantClassInfo(createUTF8Entry(string)))) as ConstantClassInfo
+    }
+
+    private fun createNameAndInfo(name: String, type: Type): ConstantNameAndInfoType {
+        return (constants[Pair("$name$type", ConstantNameAndInfoType::class.java)] ?:
+                insertIntoCache("$name$type", ConstantNameAndInfoType(
+                        createUTF8Entry(name),
+                        createUTF8Entry(type.toString()))
+                )) as ConstantNameAndInfoType
+    }
+
+    fun getstatic(clazz: String, type: String) {
+
     }
 }
 
@@ -34,7 +61,8 @@ abstract class ConstantPoolEntry(val tag: Int, val entries: Int = 1) {
         writeBytes(out)
     }
 
-    open fun writeBytes(out: DataOutputStream) {}
+    open fun writeBytes(out: DataOutputStream) {
+    }
 }
 
 /**
