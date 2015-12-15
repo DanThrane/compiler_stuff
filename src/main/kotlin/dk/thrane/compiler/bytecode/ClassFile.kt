@@ -1,21 +1,39 @@
 package dk.thrane.compiler.bytecode
 
+import java.io.DataOutputStream
 import java.util.*
 
 class ClassFile {
     companion object {
-        const val MAGIC = 0xCAFEBABE
+        const val MAGIC = 0xCAFEBABE.toInt()
         const val MAJOR_VERSION = 49
         const val MINOR_VERSION = 0
     }
 
-    private val constantPool: MutableList<ConstantPoolEntry> = ArrayList()
-    private val accessFlags: MutableList<AccessFlag> = ArrayList()
-    // u2: this class
-    // u2: super class
-    // u2: interface count
-    // u2: interfaces
-    private val classFields: MutableList<ClassField> = ArrayList()
-    private val methods: MutableList<Method> = ArrayList()
-    private val attributes: MutableList<Attribute> = ArrayList()
+    val constantPool = ConstantPool()
+    val accessFlags: MutableList<AccessFlag> = ArrayList()
+    var thisClass: ConstantClassInfo? = null
+    var superClass: ConstantClassInfo? = null
+    var interfaces: MutableList<ConstantClassInfo> = ArrayList()
+    val classFields: MutableList<ClassField> = ArrayList()
+    val methods: MutableList<Method> = ArrayList()
+    val attributes: MutableList<Attribute> = ArrayList()
+
+    fun write(out: DataOutputStream) {
+        out.writeInt(MAGIC)
+        out.writeShort(MAJOR_VERSION)
+        out.writeShort(MINOR_VERSION)
+        constantPool.write(out)
+        AccessFlag.combine(accessFlags)
+        out.writeShort(thisClass!!.index)
+        out.writeShort(if (superClass != null) superClass!!.index else 0)
+        out.writeShort(interfaces.size)
+        interfaces.forEach { out.writeShort(it.index) }
+        out.writeShort(classFields.size)
+        classFields.forEach { it.write(out) }
+        out.writeShort(methods.size)
+        methods.forEach { it.write(out) }
+        out.writeShort(attributes.size)
+        attributes.forEach { it.write(out) }
+    }
 }

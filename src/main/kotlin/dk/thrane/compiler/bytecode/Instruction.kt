@@ -1113,85 +1113,85 @@ class Instruction(val opcode: Int, val body: ((DataOutputStream) -> (Unit))? = n
          * [No change]
          * increment local variable #index by signed byte const
          */
-        val iinc /*(2: index, const)*/ = Instruction(0x84)
+        fun iinc (index: Int, const: Int) = Instruction(0x84, { it.writeByte(index); it.writeByte(const) })
 
         /**
          * objectref → value
          * get a field value of an object objectref, where the field is identified by field reference in the constant pool index (index1 << 8 + index2)
          */
-        fun getfield(param: Int) = Instruction(0xb4, { it.writeShort(param) })
+        fun getfield(param: ConstantFieldRefInfo) = Instruction(0xb4, { it.writeShort(param.index) })
 
         /**
          * → value
          * get a static field value of a class, where the field is identified by field reference in the constant pool index (index1 << 8 + index2)
          */
-        fun getstatic(param: Int) = Instruction(0xb2, { it.writeShort(param) })
+        fun getstatic(param: ConstantFieldRefInfo) = Instruction(0xb2, { it.writeShort(param.index) })
 
         /**
          * count → arrayref
          * create a new array of references of length count and component type identified by the class reference index (indexbyte1 << 8 + indexbyte2) in the constant pool
          */
-        fun anewarray(param: Int) = Instruction(0xbd, { it.writeShort(param) })
+        fun anewarray(param: ConstantClassInfo) = Instruction(0xbd, { it.writeShort(param.index) })
 
         /**
          * objectref → objectref
          * checks whether an objectref is of a certain type, the class reference of which is in the constant pool at index (indexbyte1 << 8 + indexbyte2)
          */
-        fun checkcast(param: Int) = Instruction(0xc0, { it.writeShort(param) })
+        fun checkcast(param: ConstantClassInfo) = Instruction(0xc0, { it.writeShort(param.index) })
 
         /**
          * objectref → result
          * determines if an object objectref is of a given type, identified by class reference index in constant pool (indexbyte1 << 8 + indexbyte2)
          */
-        fun instanceof(param: Int) = Instruction(0xc1, { it.writeShort(param) })
+        fun instanceof(param: ConstantClassInfo) = Instruction(0xc1, { it.writeShort(param.index) })
 
         /**
          * objectref, [arg1, arg2, ...] → result
          * invoke instance method on object objectref and puts the result on the stack (might be void); the method is identified by method reference index in constant pool (indexbyte1 << 8 + indexbyte2)
          */
-        fun invokespecial(param: Int) = Instruction(0xb7, { it.writeShort(param) })
+        fun invokespecial(param: ConstantMethodRefInfo) = Instruction(0xb7, { it.writeShort(param.index) })
 
         /**
          * [arg1, arg2, ...] → result
          * invoke a static method and puts the result on the stack (might be void); the method is identified by method reference index in constant pool (indexbyte1 << 8 + indexbyte2)
          */
-        fun invokestatic(param: Int) = Instruction(0xb8, { it.writeShort(param) })
+        fun invokestatic(param: ConstantMethodRefInfo) = Instruction(0xb8, { it.writeShort(param.index) })
 
         /**
          * objectref, [arg1, arg2, ...] → result
          * invoke virtual method on object objectref and puts the result on the stack (might be void); the method is identified by method reference index in constant pool (indexbyte1 << 8 + indexbyte2)
          */
-        fun invokevirtual(param: Int) = Instruction(0xb6, { it.writeShort(param) })
+        fun invokevirtual(param: ConstantMethodRefInfo) = Instruction(0xb6, { it.writeShort(param.index) })
 
         /**
          * → value
          * push a constant #index from a constant pool (String, int or float) onto the stack (wide index is constructed as indexbyte1 << 8 + indexbyte2)
          */
-        fun ldc_w(param: Int) = Instruction(0x13, { it.writeShort(param) })
+        fun ldc_w(param: ConstantPoolEntry) = Instruction(0x13, { it.writeShort(param.index) })
 
         /**
          * → value
          * push a constant #index from a constant pool (double or long) onto the stack (wide index is constructed as indexbyte1 << 8 + indexbyte2)
          */
-        fun ldc2_w(param: Int) = Instruction(0x14, { it.writeShort(param) })
+        fun ldc2_w(param: ConstantPoolEntry) = Instruction(0x14, { it.writeShort(param.index) })
 
         /**
          * → objectref
          * create new object of type identified by class reference in constant pool index (indexbyte1 << 8 + indexbyte2)
          */
-        fun new(param: Int) = Instruction(0xbb, { it.writeShort(param) })
+        fun new(param: ConstantPoolEntry) = Instruction(0xbb, { it.writeShort(param.index) })
 
         /**
          * objectref, value →
          * set field to value in an object objectref, where the field is identified by a field reference index in constant pool (indexbyte1 << 8 + indexbyte2)
          */
-        fun putfield(param: Int) = Instruction(0xb5, { it.writeShort(param) })
+        fun putfield(param: ConstantFieldRefInfo) = Instruction(0xb5, { it.writeShort(param.index) })
 
         /**
          * value →
          * set static field to value in a class, where the field is identified by a field reference index in constant pool (indexbyte1 << 8 + indexbyte2)
          */
-        fun putstatic(param: Int) = Instruction(0xb3, { it.writeShort(param) })
+        fun putstatic(param: ConstantFieldRefInfo) = Instruction(0xb3, { it.writeShort(param.index) })
 
         /**
          * [same as for corresponding instructions]
@@ -1205,7 +1205,7 @@ iinc, indexbyte1, indexbyte2, countbyte1, countbyte2)*/ = Instruction(0xc4)
          * count1, [count2,...] → arrayref
          * create a new array of dimensions dimensions with elements of type identified by class reference in constant pool index (indexbyte1 << 8 + indexbyte2); the sizes of each dimension is identified by count1, [count2, etc.]
          */
-        val multianewarray /*(3: indexbyte1, indexbyte2, dimensions)*/ = Instruction(0xc5)
+        fun multianewarray(index: Int, dimensions: Int) = Instruction(0xc5, { it.writeShort(index); it.writeByte(dimensions)})
 
         /**
          * key →

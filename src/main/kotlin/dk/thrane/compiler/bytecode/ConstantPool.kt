@@ -8,6 +8,7 @@ import java.util.*
 class ConstantPool {
     private val entries: MutableList<ConstantPoolEntry> = ArrayList()
     private var nextIndex: Int = 0
+    private val strings: MutableMap<String, ConstantUtf8Info> = HashMap()
 
     fun write(out: DataOutputStream) {
         out.writeShort(nextIndex)
@@ -19,6 +20,15 @@ class ConstantPool {
         entry.pool = this
         entries.add(entry)
         nextIndex += entry.entries
+    }
+
+    fun insertString(string: String): ConstantUtf8Info {
+        if (strings.contains(string)) {
+            return strings[string] ?: throw IllegalStateException("String disappeared unexpectedly.")
+        }
+        val constantUtfInfo = ConstantUtf8Info(string)
+        insertEntry(constantUtfInfo)
+        return constantUtfInfo
     }
 }
 

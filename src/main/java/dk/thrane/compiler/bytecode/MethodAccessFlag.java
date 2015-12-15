@@ -1,5 +1,7 @@
 package dk.thrane.compiler.bytecode;
 
+import java.util.List;
+
 public enum MethodAccessFlag {
     /**
      * Declared public; may be accessed from outside its package.
@@ -60,7 +62,7 @@ public enum MethodAccessFlag {
         return value;
     }
 
-    public static int combine(MethodAccessFlag... modifiers) {
+    public static int combine(List<MethodAccessFlag> modifiers) {
         int result = 0;
         for (MethodAccessFlag modifier : modifiers) {
             result |= modifier.getValue();

@@ -1,5 +1,7 @@
 package dk.thrane.compiler.bytecode;
 
+import java.util.List;
+
 /**
  * Taken from table 4.1-A from the JVM SE 8 Specification
  */
@@ -47,7 +49,7 @@ public enum AccessFlag {
         return value;
     }
 
-    public static int combine(AccessFlag... modifiers) {
+    public static int combine(List<AccessFlag> modifiers) {
         int result = 0;
         for (AccessFlag modifier : modifiers) {
             result |= modifier.getValue();
