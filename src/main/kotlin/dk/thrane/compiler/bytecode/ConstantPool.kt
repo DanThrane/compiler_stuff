@@ -1,12 +1,17 @@
 package dk.thrane.compiler.bytecode
 
-import dk.thrane.compiler.type.Type
 import java.io.DataOutputStream
 import java.util.*
 
 class ConstantPool {
     private val entries: MutableList<ConstantPoolEntry> = ArrayList()
-    private var nextIndex: Int = 0
+    /**
+     * The value of the constant_pool_count item is equal to the <b>number of entries
+     * in the constant_pool table plus one</b>. A constant_pool index is considered
+     * valid if it is greater than zero and less than constant_pool_count, with the
+     * exception for constants of type long and double noted in JVMSE8 §4.4.5.
+     */
+    private var nextIndex: Int = 1
     private val constants: MutableMap<Pair<String, Class<*>>, ConstantPoolEntry> = HashMap()
 
     fun write(out: DataOutputStream) {
@@ -23,29 +28,49 @@ class ConstantPool {
 
     private fun insertIntoCache(name: String, value: ConstantPoolEntry): ConstantPoolEntry {
         constants[Pair(name, value.javaClass)] = value
+        insertEntry(value)
         return value
     }
 
-    private fun createUTF8Entry(string: String): ConstantUtf8Info {
+    fun utf8(string: String): ConstantUtf8Info {
         return (constants[Pair(string, ConstantUtf8Info::class.java)] ?:
                 insertIntoCache(string, ConstantUtf8Info(string))) as ConstantUtf8Info
     }
 
-    private fun createClassEntry(string: String): ConstantClassInfo {
-        return (constants[Pair(string, ConstantClassInfo::class.java)] ?:
-                insertIntoCache(string, ConstantClassInfo(createUTF8Entry(string)))) as ConstantClassInfo
+    fun string(string: String): ConstantStringInfo {
+        return (constants[Pair(string, ConstantStringInfo::class.java)] ?:
+                insertIntoCache(string, ConstantStringInfo(utf8(string)))) as ConstantStringInfo
     }
 
-    private fun createNameAndInfo(name: String, type: Type): ConstantNameAndInfoType {
+    fun classRef(string: String): ConstantClassInfo {
+        return (constants[Pair(string, ConstantClassInfo::class.java)] ?:
+                insertIntoCache(string, ConstantClassInfo(utf8(string)))) as ConstantClassInfo
+    }
+
+    fun classRef(vararg strings: String) = classRef(strings.joinToString("/"))
+
+    fun nameAndType(name: String, type: Descriptor): ConstantNameAndInfoType {
         return (constants[Pair("$name$type", ConstantNameAndInfoType::class.java)] ?:
                 insertIntoCache("$name$type", ConstantNameAndInfoType(
-                        createUTF8Entry(name),
-                        createUTF8Entry(type.toString()))
+                        utf8(name),
+                        utf8(type.toString()))
                 )) as ConstantNameAndInfoType
     }
 
-    fun getstatic(clazz: String, type: String) {
+    fun descriptor(type: Descriptor): ConstantUtf8Info {
+        return utf8(type.toString())
+    }
 
+    fun fieldRef(classInfo: ConstantClassInfo, nameAndInfoType: ConstantNameAndInfoType): ConstantFieldRefInfo {
+        return (constants[Pair("$classInfo$nameAndInfoType", ConstantFieldRefInfo::class.java)] ?:
+                insertIntoCache("$classInfo$nameAndInfoType",
+                        ConstantFieldRefInfo(classInfo, nameAndInfoType))) as ConstantFieldRefInfo
+    }
+
+    fun methodRef(classInfo: ConstantClassInfo, nameAndInfoType: ConstantNameAndInfoType): ConstantMethodRefInfo{
+        return (constants[Pair("$classInfo$nameAndInfoType", ConstantMethodRefInfo::class.java)] ?:
+                insertIntoCache("$classInfo$nameAndInfoType",
+                        ConstantMethodRefInfo(classInfo, nameAndInfoType))) as ConstantMethodRefInfo
     }
 }
 

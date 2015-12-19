@@ -975,7 +975,7 @@ class Instruction(val opcode: Int, val body: ((DataOutputStream) -> (Unit))? = n
          * → value
          * push a constant #index from a constant pool (String, int or float) onto the stack
          */
-        fun ldc(index: Int) = Instruction(0x12, { it.writeByte(index) })
+        fun ldc(entry: ConstantPoolEntry) = Instruction(0x12, { it.writeByte(entry.index) })
 
         /**
          * → value

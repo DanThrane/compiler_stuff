@@ -1,9 +1,10 @@
 package dk.thrane.compiler.bytecode
 
-interface ReturnDescriptor
-interface FieldType : ReturnDescriptor
+interface Descriptor
+interface ReturnDescriptor : Descriptor
+interface FieldDescriptor : ReturnDescriptor
 
-enum class BaseType(val term: String) : FieldType {
+enum class BaseDescriptor(val term: String) : FieldDescriptor {
     BYTE("B"),
     CHAR("C"),
     DOUBLE("D"),
@@ -16,18 +17,20 @@ enum class BaseType(val term: String) : FieldType {
     override fun toString(): String = term
 }
 
-class ObjectType(val className: String) : FieldType {
+class ObjectDescriptor(val className: String) : FieldDescriptor {
+    constructor(vararg classes: String) : this(classes.joinToString("/")) {}
+
     override fun toString(): String = "L$className;"
 }
 
-class ArrayType(val type: FieldType) : FieldType {
+class ArrayDescriptor(val type: FieldDescriptor) : FieldDescriptor {
     override fun toString(): String = "[$type"
 }
 
-class VoidDescriptor : ReturnDescriptor {
+object VoidDescriptor : ReturnDescriptor {
     override fun toString(): String = "V"
 }
 
-class MethodDescriptor(val parameterTypes: List<FieldType>, val returnType: ReturnDescriptor) {
+class MethodDescriptor(val parameterTypes: List<FieldDescriptor>, val returnType: ReturnDescriptor) : Descriptor {
     override fun toString(): String = "(${parameterTypes.map { it.toString() }.joinToString("")})$returnType"
 }

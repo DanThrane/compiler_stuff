@@ -21,10 +21,10 @@ class ClassFile {
 
     fun write(out: DataOutputStream) {
         out.writeInt(MAGIC)
-        out.writeShort(MAJOR_VERSION)
         out.writeShort(MINOR_VERSION)
+        out.writeShort(MAJOR_VERSION)
         constantPool.write(out)
-        AccessFlag.combine(accessFlags)
+        out.writeShort(AccessFlag.combine(accessFlags))
         out.writeShort(thisClass!!.index)
         out.writeShort(if (superClass != null) superClass!!.index else 0)
         out.writeShort(interfaces.size)
