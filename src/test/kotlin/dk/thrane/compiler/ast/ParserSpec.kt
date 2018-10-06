@@ -1,10 +1,8 @@
 package dk.thrane.compiler.ast
 
 import org.junit.Test
-import kotlin.test.assertEquals
 import dk.thrane.compiler.ast.Tokens.*
-import kotlin.test.assertFalse
-import kotlin.test.assertTrue
+import junit.framework.TestCase.*
 
 class ParserSpec {
     @Test
@@ -16,10 +14,10 @@ class ParserSpec {
         """
 
         val result = parser.parse(source)
-        assertEquals(result.functions.size, 1, "One function should be present")
-        assertEquals(result.functions[0].head.name, "foobar", "Name of function should be foobar")
-        assertEquals(result.functions[0].head.parameters.size, 0, "There should be no parameters present")
-        assertEquals(result.functions[0].head.name, result.functions[0].tail.name, "Head and tail identifier should match")
+        assertEquals(result.functions.size, 1)
+        assertEquals(result.functions[0].head.name, "foobar")
+        assertEquals(result.functions[0].head.parameters.size, 0)
+        assertEquals(result.functions[0].head.name, result.functions[0].tail.name)
     }
 
     @Test
@@ -35,11 +33,10 @@ class ParserSpec {
         val head = result.functions[0].head
 
         // Check basic function characteristics
-        assertEquals(result.functions.size, 1, "One functino should be present")
-        assertEquals(head.name, "foobar", "Name of function should be foobar")
-        assertEquals(head.parameters.size, 7, "Seven parameters should be present")
-        assertEquals(head.parameters.map { it.name }, listOf("a", "b", "c", "d", "e", "f", "g"),
-                "Parameters should have the correct names")
+        assertEquals(result.functions.size, 1)
+        assertEquals(head.name, "foobar")
+        assertEquals(head.parameters.size, 7)
+        assertEquals(head.parameters.map { it.name }, listOf("a", "b", "c", "d", "e", "f", "g"))
 
         // The the parameter types
 //        assertEquals(head.parameters.map { it.typeNode }, listOf(T_INT, T_BOOL, T_CHAR, T_ARRAY, T_ARRAY, T_RECORD,
@@ -81,17 +78,20 @@ class ParserSpec {
                         checkingRecord = true
                     } else if (checkingRecord) {
                         if (type is Map<*, *>) {
-                            assertEquals(type.size, current.fields.size, "Not enough fields in record ($name)")
+                            val map = type as Map<String, Any>
+
+                            assertEquals(type.size, current.fields.size)
                             for (field in current.fields) {
                                 @Suppress("UNCHECKED_CAST")
-                                requireType(field.typeNode, type.getRaw(field.name) as List<Any>, name)
+                                requireType(field.typeNode, map[field.name] as List<Any>, name)
                             }
                         } else {
-                            assertTrue(false, "Error in type. Expected $type to be a map")
+                            assertTrue(false)
                         }
                     }
                 }
-                is TypeNode -> {
+
+                else -> {
 //                    assertEquals(current.type, type, "While checking $name. Full type is $node")
                 }
             }

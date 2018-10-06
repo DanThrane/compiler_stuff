@@ -202,7 +202,7 @@ class ConstantNameAndInfoType(val name: ConstantUtf8Info, val descriptor: Consta
 
 class ConstantUtf8Info(val string: String) : ConstantPoolEntry(1) {
     override fun writeBytes(out: DataOutputStream) {
-        val bytes = string.toByteArray("UTF-8")
+        val bytes = string.toByteArray()
         out.writeShort(bytes.size)
         bytes.forEach { out.writeByte(it.toInt()) }
     }
