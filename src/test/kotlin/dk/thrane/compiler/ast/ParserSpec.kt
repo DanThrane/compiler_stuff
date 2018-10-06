@@ -77,9 +77,9 @@ class ParserSpec {
                         assertFalse(checkingRecord)
                         checkingRecord = true
                     } else if (checkingRecord) {
-                        if (type is Map<*, *>) {
-                            val map = type as Map<String, Any>
-
+                        @Suppress("UNCHECKED_CAST")
+                        val map = type as? Map<String, Any>
+                        if (map != null) {
                             assertEquals(type.size, current.fields.size)
                             for (field in current.fields) {
                                 @Suppress("UNCHECKED_CAST")
