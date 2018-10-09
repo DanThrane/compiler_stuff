@@ -1,6 +1,32 @@
 package dk.thrane.compiler.type
 
-import dk.thrane.compiler.ast.*
+import dk.thrane.compiler.ast.AbsoluteNode
+import dk.thrane.compiler.ast.AllocNode
+import dk.thrane.compiler.ast.ArrayAccessNode
+import dk.thrane.compiler.ast.AssignmentNode
+import dk.thrane.compiler.ast.BinaryExpressionNode
+import dk.thrane.compiler.ast.BlockNode
+import dk.thrane.compiler.ast.BooleanLiteralNode
+import dk.thrane.compiler.ast.ExpressionNode
+import dk.thrane.compiler.ast.FieldAccessNode
+import dk.thrane.compiler.ast.FunctionCallNode
+import dk.thrane.compiler.ast.IfNode
+import dk.thrane.compiler.ast.NegationNode
+import dk.thrane.compiler.ast.Node
+import dk.thrane.compiler.ast.NullLiteralNode
+import dk.thrane.compiler.ast.NumberLiteralNode
+import dk.thrane.compiler.ast.Operator
+import dk.thrane.compiler.ast.ParenthesisTermNode
+import dk.thrane.compiler.ast.ReturnNode
+import dk.thrane.compiler.ast.StatementNode
+import dk.thrane.compiler.ast.TermExpressionNode
+import dk.thrane.compiler.ast.TermNode
+import dk.thrane.compiler.ast.VariableAccessNode
+import dk.thrane.compiler.ast.VariableNode
+import dk.thrane.compiler.ast.VariableTermNode
+import dk.thrane.compiler.ast.Visitor
+import dk.thrane.compiler.ast.WhileNode
+import dk.thrane.compiler.ast.WriteNode
 
 class TypeChecker : Visitor() {
     override fun enterNode(node: Node) {}
@@ -24,26 +50,33 @@ class TypeChecker : Visitor() {
             is NullLiteralNode -> node.type = TypeNull()
             is VariableTermNode -> node.type = node.variableNode.type
             is FunctionCallNode -> {
-                val symbol = node.scope!!.getSymbolAndLevels(node.name) ?:
-                        throw IllegalStateException("Function of name ${node.name} not found at line " +
-                                "${node.lineNumber}")
+                val symbol = node.scope!!.getSymbolAndLevels(node.name) ?: throw IllegalStateException(
+                    "Function of name ${node.name} not found at line " +
+                            "${node.lineNumber}"
+                )
 
                 if (symbol.first.type !is TypeFunction) {
-                    throw IllegalStateException("Expected ${node.name} on line ${node.lineNumber} to reference " +
-                            "a function.")
+                    throw IllegalStateException(
+                        "Expected ${node.name} on line ${node.lineNumber} to reference " +
+                                "a function."
+                    )
                 }
                 // NOTE: We should really have a way of locking an object, such that its value may no longer change
                 val functionType = symbol.first.type as TypeFunction
                 if (node.arguments.size != functionType.parameterTypes.size) {
-                    throw IllegalStateException("Expected ${functionType.parameterTypes.size} parameters for " +
-                            "function ${node.name}, but got ${node.arguments.size} arguments.")
+                    throw IllegalStateException(
+                        "Expected ${functionType.parameterTypes.size} parameters for " +
+                                "function ${node.name}, but got ${node.arguments.size} arguments."
+                    )
                 }
                 for (i in 0..node.arguments.size - 1) {
                     val given = node.arguments[i].type!!
                     val expected = functionType.parameterTypes[i].second
                     if (!Type.checkCompatibility(expected, given)) {
-                        throw IllegalStateException("Type mismatch at line ${node.lineNumber}. Expected parameter " +
-                                "$i to be of type $expected, but instead got $given")
+                        throw IllegalStateException(
+                            "Type mismatch at line ${node.lineNumber}. Expected parameter " +
+                                    "$i to be of type $expected, but instead got $given"
+                        )
                     }
                 }
                 node.type = functionType.returnType
@@ -71,33 +104,41 @@ class TypeChecker : Visitor() {
         val leftInvalid = expectedLeft.any { !Type.checkCompatibility(it, node.left.type!!) }
         val rightInvalid = expectedLeft.any { !Type.checkCompatibility(it, node.right.type!!) }
         if (leftInvalid) {
-            throw IllegalStateException("On line ${node.lineNumber}: Left side of ${node.operator} isn't " +
-                    "$expectedLeft!")
+            throw IllegalStateException(
+                "On line ${node.lineNumber}: Left side of ${node.operator} isn't " +
+                        "$expectedLeft!"
+            )
         }
         if (rightInvalid) {
-            throw IllegalStateException("On line ${node.lineNumber}: Right side of ${node.operator} isn't " +
-                    "$expectedRight!")
+            throw IllegalStateException(
+                "On line ${node.lineNumber}: Right side of ${node.operator} isn't " +
+                        "$expectedRight!"
+            )
         }
     }
 
     private fun checkExpressionNode(node: ExpressionNode) {
         when (node) {
             is BinaryExpressionNode -> {
-                when (node) {
-                    is MultiplicationNode, is DivisionNode, is AddNode, is MinusNode, is ModuloNode -> {
+                when (node.operator) {
+                    Operator.MULTIPLICATION, Operator.DIVISION, Operator.ADD, Operator.MINUS,
+                    Operator.MODULO -> {
                         checkBinaryExpression(listOf(TypeInt()), listOf(TypeInt()), node)
                         node.type = TypeInt()
                     }
-                    is CompareGreaterThanOrEqualsNode, is CompareGreaterThanNode, is CompareLessThanOrEqualsNode,
-                    is CompareLessThanNode -> {
+
+                    Operator.COMPARE_GREATER_THAN, Operator.COMPARE_GREATER_THAN_OR_EQUALS,
+                    Operator.COMPARE_LESS_THAN, Operator.COMPARE_LESS_THAN_OR_EQUALS -> {
                         checkBinaryExpression(listOf(TypeInt()), listOf(TypeInt()), node)
                         node.type = TypeBool()
                     }
-                    is AndNode, is OrNode -> {
+
+                    Operator.AND, Operator.OR -> {
                         checkBinaryExpression(listOf(TypeBool()), listOf(TypeBool()), node)
                         node.type = TypeBool()
                     }
-                    is CompareEqualNode, is CompareNotEqualNode -> {
+
+                    Operator.COMPARE_EQUAL, Operator.COMPARE_NOT_EQUAL -> {
                         if (Type.checkCompatibility(node.left.type!!, node.right.type!!)) {
                             throw IllegalStateException("Cannot compare ${node.left.type} and ${node.right.type}")
                         }
@@ -130,9 +171,10 @@ class TypeChecker : Visitor() {
                 if (type !is TypeRecord) {
                     throw IllegalStateException("Attempting to access field on a non-record type!")
                 }
-                val field = type.fieldTypes.find { it.first == node.fieldName } ?:
-                        throw IllegalStateException("Field of name ${node.fieldName} does not exist on record " +
-                                "of type $type")
+                val field = type.fieldTypes.find { it.first == node.fieldName } ?: throw IllegalStateException(
+                    "Field of name ${node.fieldName} does not exist on record " +
+                            "of type $type"
+                )
                 node.type = field.second
             }
         }
@@ -143,13 +185,16 @@ class TypeChecker : Visitor() {
             is ReturnNode -> {
                 val returnType = node.scope!!.function!!.returnType
                 if (!Type.checkCompatibility(returnType, node.expression.type!!)) {
-                    throw IllegalStateException("Expected function to return $returnType, but instead got " +
-                            "${node.expression.type!!}")
+                    throw IllegalStateException(
+                        "Expected function to return $returnType, but instead got " +
+                                "${node.expression.type!!}"
+                    )
                 }
             }
             is WriteNode -> {
                 when (node.expression.type!!) {
-                    is TypeInt, is TypeBool -> {}
+                    is TypeInt, is TypeBool -> {
+                    }
                     else -> throw IllegalStateException("Write not supported for this type: ${node.expression.type!!}}")
                 }
             }
@@ -161,8 +206,10 @@ class TypeChecker : Visitor() {
                             throw IllegalStateException("Length needed for array")
                         } else {
                             if (!Type.checkCompatibility(TypeInt(), node.expression!!.type!!)) {
-                                throw IllegalStateException("Expected int for array length, but got " +
-                                        "${node.expression!!.type!!}")
+                                throw IllegalStateException(
+                                    "Expected int for array length, but got " +
+                                            "${node.expression!!.type!!}"
+                                )
                             }
                         }
                     }
@@ -183,17 +230,22 @@ class TypeChecker : Visitor() {
             }
             is IfNode -> {
                 if (!Type.checkCompatibility(TypeBool(), node.expression.type!!)) {
-                    throw IllegalStateException("Expected if statement to contain boolean expression, but instead " +
-                            "got ${node.expression.type!!}")
+                    throw IllegalStateException(
+                        "Expected if statement to contain boolean expression, but instead " +
+                                "got ${node.expression.type!!}"
+                    )
                 }
             }
             is WhileNode -> {
                 if (!Type.checkCompatibility(TypeBool(), node.expression.type!!)) {
-                    throw IllegalStateException("Expected while statement to contain boolean expression, but instead " +
-                            "got ${node.expression.type!!}")
+                    throw IllegalStateException(
+                        "Expected while statement to contain boolean expression, but instead " +
+                                "got ${node.expression.type!!}"
+                    )
                 }
             }
-            is BlockNode -> {}
+            is BlockNode -> {
+            }
         }
     }
 }
