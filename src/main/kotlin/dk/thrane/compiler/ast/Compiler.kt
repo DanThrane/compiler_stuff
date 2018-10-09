@@ -1,22 +1,26 @@
 package dk.thrane.compiler.ast
 
-import java.nio.file.Files
-import java.nio.file.Paths
-
-import dk.thrane.compiler.ast.Tokens.*
 import dk.thrane.compiler.type.SymbolGatherer
 import dk.thrane.compiler.type.TypeChecker
 import dk.thrane.compiler.weeder.ReturnCheck
+import java.nio.file.Files
+import java.nio.file.Paths
 
 class FunctionCheck : Visitor() {
     override fun enterNode(node: Node) {
         when (node) {
             is FunctionNode -> {
                 if (node.head.name != node.tail.name) {
-                    throw IllegalStateException("Name in head of function does not match name in tail of function!" +
-                            " Head defined at line ${node.head.lineNumber}, tail at line ${node.tail.lineNumber}")
+                    throw IllegalStateException(
+                        "Name in head of function does not match name in tail of function!" +
+                                " Head defined at line ${node.head.lineNumber}, tail at line ${node.tail.lineNumber}"
+                    )
                 }
                 visitChildren = false
+            }
+
+            else -> {
+                // Do nothing
             }
         }
     }
