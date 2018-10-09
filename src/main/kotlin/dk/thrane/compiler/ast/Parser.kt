@@ -238,21 +238,7 @@ class Parser {
                 op = findOperator(lookahead.tokenType)
             }
 
-            result = when (oldOp) {
-                Operator.MULTIPLICATION -> MultiplicationNode(lineNumber, left, rhs)
-                Operator.DIVISION -> DivisionNode(lineNumber, left, rhs)
-                Operator.MODULO -> ModuloNode(lineNumber, left, rhs)
-                Operator.ADD -> AddNode(lineNumber, left, rhs)
-                Operator.MINUS -> MinusNode(lineNumber, left, rhs)
-                Operator.COMPARE_LESS_THAN -> CompareLessThanNode(lineNumber, left, rhs)
-                Operator.COMPARE_GREATER_THAN -> CompareGreaterThanNode(lineNumber, left, rhs)
-                Operator.COMPARE_LESS_THAN_OR_EQUALS -> CompareLessThanOrEqualsNode(lineNumber, left, rhs)
-                Operator.COMPARE_GREATER_THAN_OR_EQUALS -> CompareGreaterThanOrEqualsNode(lineNumber, left, rhs)
-                Operator.COMPARE_EQUAL -> CompareEqualNode(lineNumber, left, rhs)
-                Operator.COMPARE_NOT_EQUAL -> CompareNotEqualNode(lineNumber, left, rhs)
-                Operator.AND -> AndNode(lineNumber, left, rhs)
-                Operator.OR -> OrNode(lineNumber, left, rhs)
-            }
+            result = BinaryExpressionNode(lineNumber, left, rhs, oldOp)
         }
         return result
     }
