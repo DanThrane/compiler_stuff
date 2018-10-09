@@ -40,6 +40,10 @@ class SymbolGatherer : Visitor() {
             is RecordTypeNode -> {
                 enterScope()
             }
+
+            else -> {
+                // Do nothing
+            }
         }
     }
 

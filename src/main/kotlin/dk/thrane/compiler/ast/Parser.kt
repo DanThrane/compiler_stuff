@@ -79,7 +79,7 @@ class Parser {
         val next = Tokens.nextToken(cursor)
         val lineNumber = cursor.lineNumber
         return when (next.tokenType) {
-            T_INT, T_BOOL, T_CHAR -> TypeNode(lineNumber, next.tokenType)
+            T_INT, T_BOOL, T_CHAR -> PrimitiveTypeNode(lineNumber, next.tokenType)
             T_ID -> IdentifierType(lineNumber, ((next.value as String?)!!))
             T_ARRAY -> ArrayTypeNode(lineNumber, type(cursor))
             T_RECORD -> {
