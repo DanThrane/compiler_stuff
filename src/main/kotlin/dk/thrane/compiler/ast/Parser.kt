@@ -209,7 +209,7 @@ class Parser {
     }
 
     private fun findOperator(token: Tokens): Operator? {
-        return Operator.values.find { it.token == token }
+        return Operator.values().find { it.token == token }
     }
 
     private fun expression(cursor: Cursor): ExpressionNode {

@@ -82,7 +82,7 @@ enum class Tokens {
 
         fun nextToken(cursor: Cursor, eat: Boolean = true): Token {
             T_WHITESPACE.consume(cursor)
-            for (type in values) {
+            for (type in values()) {
                 var token = type.consume(cursor, eat)
                 if (token != null) {
                     return token
