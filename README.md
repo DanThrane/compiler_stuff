@@ -67,9 +67,9 @@ by `end` followed by the function name.
 A function returning an integer would be defined like this:
 
 ```
-func returnMe(a: int): int
+func returnInteger(a: int): int
     return a;
-end returnMe
+end returnInteger
 ```
 
 which defines the function `returnMe` which takes a single argument, an integer.
@@ -80,6 +80,6 @@ Calling the function is done like most C-like programming languages:
 returnMe(5);
 ```
 
-## TODO - GRAMMAR
-
 ## TODO - HELLO WORLD
+
+## TODO - GRAMMAR
