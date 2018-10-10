@@ -1,6 +1,12 @@
 package dk.thrane.compiler.type
 
-import dk.thrane.compiler.ast.*
+import dk.thrane.compiler.ast.FieldDeclarationNode
+import dk.thrane.compiler.ast.FunctionNode
+import dk.thrane.compiler.ast.Node
+import dk.thrane.compiler.ast.RecordTypeNode
+import dk.thrane.compiler.ast.TypeDeclarationNode
+import dk.thrane.compiler.ast.VariableDeclarationNode
+import dk.thrane.compiler.ast.Visitor
 
 class SymbolGatherer : Visitor() {
     val global: SymbolTable = SymbolTable()

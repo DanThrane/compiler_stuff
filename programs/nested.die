@@ -1,0 +1,8 @@
+func foobar(a: int): int
+    func nested(b: int): int
+        write b;
+        return 1;
+    end nested
+
+    return 1;
+end foobar
