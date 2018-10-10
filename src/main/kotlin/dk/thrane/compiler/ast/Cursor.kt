@@ -1,7 +1,5 @@
 package dk.thrane.compiler.ast
 
-import kotlin.text.Regex
-
 class Cursor(val source: String) {
     var idx: Int = 0
     var lineNumber: Int = 1

@@ -1,6 +1,12 @@
 package dk.thrane.compiler.weeder
 
-import dk.thrane.compiler.ast.*
+import dk.thrane.compiler.ast.BlockNode
+import dk.thrane.compiler.ast.FunctionBody
+import dk.thrane.compiler.ast.IfNode
+import dk.thrane.compiler.ast.Node
+import dk.thrane.compiler.ast.ReturnNode
+import dk.thrane.compiler.ast.StatementNode
+import dk.thrane.compiler.ast.Visitor
 
 class ReturnCheck : Visitor() {
     private fun checkStatementList(statements: List<StatementNode>): Boolean {
@@ -29,8 +35,10 @@ class ReturnCheck : Visitor() {
         when (node) {
             is FunctionBody -> {
                 if (!checkStatementList(node.statements)) {
-                    throw IllegalStateException("Unable to find return in function starting at line: " +
-                            "${node.lineNumber}")
+                    throw IllegalStateException(
+                        "Unable to find return in function starting at line: " +
+                                "${node.lineNumber}"
+                    )
                 }
             }
 

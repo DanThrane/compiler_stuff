@@ -34,7 +34,8 @@ open class Type {
                         val leftField = currentLeft.fieldTypes[i]
                         val rightField = currentRight.fieldTypes[i]
                         if (leftField.first != rightField.first ||
-                                !checkCompatibility(leftField.second, rightField.second)) {
+                            !checkCompatibility(leftField.second, rightField.second)
+                        ) {
                             return false
                         }
                     }
@@ -67,7 +68,7 @@ class TypeChar : Type()
 class TypeNull : Type()
 class TypeUnit : Type()
 class TypeRecord(val fieldTypes: List<Pair<String, Type>>) : Type()
-class TypeArray(val type: Type): Type()
+class TypeArray(val type: Type) : Type()
 class TypeFunction(val parameterTypes: List<Pair<String, Type>>, val returnType: Type) : Type()
 class TypeTypedef(val type: Type) : Type()
 class TypeUnresolved(val identifier: String) : Type()

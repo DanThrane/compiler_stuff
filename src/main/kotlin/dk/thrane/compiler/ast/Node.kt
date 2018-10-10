@@ -56,19 +56,26 @@ class VariableDeclarationNode(lineNumber: Int, var variables: MutableList<FieldD
 
 // Functions
 
-class FunctionNode(override var lineNumber: Int, var head: FunctionHead, var body: FunctionBody,
-                   var tail: FunctionTail) : Node() {
+class FunctionNode(
+    override var lineNumber: Int, var head: FunctionHead, var body: FunctionBody,
+    var tail: FunctionTail
+) : DeclarationNode(lineNumber) {
     override val children: List<Node>
         get() = listOf(head, body, tail)
 }
 
-class FunctionHead(override var lineNumber: Int, var name: String,
-                   var parameters: MutableList<FieldDeclarationNode>, val typeNode: TypeNode?) : Node() {
+class FunctionHead(
+    override var lineNumber: Int, var name: String,
+    var parameters: MutableList<FieldDeclarationNode>, val typeNode: TypeNode?
+) : Node() {
     override val children: List<Node>
         get() = parameters
 }
-class FunctionBody(override var lineNumber: Int, var declarations: List<DeclarationNode>,
-                   var statements: MutableList<StatementNode>) : Node() {
+
+class FunctionBody(
+    override var lineNumber: Int, var declarations: List<DeclarationNode>,
+    var statements: MutableList<StatementNode>
+) : Node() {
     override val children: List<Node>
         get() = declarations + statements
 }
@@ -88,6 +95,7 @@ sealed class StatementNode(override var lineNumber: Int) : Node()
 class ReturnNode(lineNumber: Int, var expression: ExpressionNode) : StatementNode(lineNumber) {
     override val children = listOf(expression)
 }
+
 class WriteNode(lineNumber: Int, var expression: ExpressionNode) : StatementNode(lineNumber) {
     override val children = listOf(expression)
 }
@@ -102,8 +110,10 @@ class AssignmentNode(lineNumber: Int, var variable: VariableNode, var expression
     override val children = listOf(variable, expression)
 }
 
-class IfNode(lineNumber: Int, var expression: ExpressionNode, var statementNode: StatementNode,
-             var elseNode: StatementNode?) : StatementNode(lineNumber) {
+class IfNode(
+    lineNumber: Int, var expression: ExpressionNode, var statementNode: StatementNode,
+    var elseNode: StatementNode?
+) : StatementNode(lineNumber) {
     override val children: List<Node>
         get() = listOf(expression, statementNode) + (if (elseNode != null) listOf(elseNode as Node) else emptyList())
 }
@@ -140,7 +150,8 @@ class IdentifierType(lineNumber: Int, val identifier: String) : TypeNode(lineNum
     override fun toNativeType(): Type = TypeUnresolved(identifier)
 }
 
-class RecordTypeNode(lineNumber: Int, var fields: MutableList<FieldDeclarationNode>) : TypeNode(lineNumber, Tokens.T_RECORD) {
+class RecordTypeNode(lineNumber: Int, var fields: MutableList<FieldDeclarationNode>) :
+    TypeNode(lineNumber, Tokens.T_RECORD) {
     override fun toNativeType(): Type = TypeRecord(fields.map { Pair(it.name, it.typeNode.toNativeType()) })
 
     override val children = fields
@@ -175,7 +186,7 @@ sealed class VariableNode(override var lineNumber: Int) : Node()
 
 class VariableAccessNode(lineNumber: Int, var identifier: String) : VariableNode(lineNumber)
 
-class ArrayAccessNode(lineNumber: Int, var variableAccessNode: VariableAccessNode, var expressionNode: ExpressionNode):
+class ArrayAccessNode(lineNumber: Int, var variableAccessNode: VariableAccessNode, var expressionNode: ExpressionNode) :
     VariableNode(lineNumber) {
     override val children = listOf(variableAccessNode, expressionNode)
 }

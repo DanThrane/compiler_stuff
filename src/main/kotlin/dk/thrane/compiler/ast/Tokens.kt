@@ -2,7 +2,7 @@ package dk.thrane.compiler.ast
 
 import java.util.regex.Pattern
 
-enum class Tokens {
+enum class Tokens(regex: String) {
     T_MULTIPLICATION("\\*"),
     T_DIVISION("/"),
     T_ADD("\\+"),
@@ -56,9 +56,7 @@ enum class Tokens {
 
     var regex: Pattern? = null
 
-    constructor() {}
-
-    constructor(regex: String) {
+    init {
         this.regex = Pattern.compile(regex)
     }
 
@@ -69,8 +67,10 @@ enum class Tokens {
         }
 
         fun consume(type: Tokens, cursor: Cursor): Token {
-            return optionallyConsume(type, cursor) ?: throw IllegalStateException("Syntax error at " +
-                    "'${cursor.remainingString}' expected token $type!")
+            return optionallyConsume(type, cursor) ?: throw IllegalStateException(
+                "Syntax error at " +
+                        "'${cursor.remainingString}' expected token $type!"
+            )
         }
 
         fun peek(cursor: Cursor, count: Int): List<Token> {

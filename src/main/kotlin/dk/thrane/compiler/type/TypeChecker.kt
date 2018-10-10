@@ -69,7 +69,7 @@ class TypeChecker : Visitor() {
                                 "function ${node.name}, but got ${node.arguments.size} arguments."
                     )
                 }
-                for (i in 0..node.arguments.size - 1) {
+                for (i in 0 until node.arguments.size) {
                     val given = node.arguments[i].type!!
                     val expected = functionType.parameterTypes[i].second
                     if (!Type.checkCompatibility(expected, given)) {
@@ -157,24 +157,22 @@ class TypeChecker : Visitor() {
                 node.type = symbol.type
             }
             is ArrayAccessNode -> {
-                val type = Type.fullyResolve(node.variableAccessNode.type!!)
-                if (type !is TypeArray) {
-                    throw IllegalStateException("Attempting array access on a non-array type!")
-                }
+                val type = Type.fullyResolve(node.variableAccessNode.type!!) as? TypeArray
+                    ?: throw IllegalStateException("Attempting array access on a non-array type!")
                 if (!Type.checkCompatibility(TypeInt(), node.expressionNode.type!!)) {
                     throw IllegalStateException("Attempting to access array with non-integer index!")
                 }
                 node.type = type.type
             }
             is FieldAccessNode -> {
-                val type = Type.fullyResolve(node.variableAccessNode.type!!)
-                if (type !is TypeRecord) {
-                    throw IllegalStateException("Attempting to access field on a non-record type!")
-                }
+                val type = Type.fullyResolve(node.variableAccessNode.type!!) as? TypeRecord
+                    ?: throw IllegalStateException("Attempting to access field on a non-record type!")
+
                 val field = type.fieldTypes.find { it.first == node.fieldName } ?: throw IllegalStateException(
                     "Field of name ${node.fieldName} does not exist on record " +
                             "of type $type"
                 )
+
                 node.type = field.second
             }
         }
