@@ -11,6 +11,9 @@ class TypeChecker : Visitor() {
             is ExpressionNode -> checkExpressionNode(node)
             is VariableNode -> checkVariableNode(node)
             is StatementNode -> checkStatementNode(node)
+            else -> {
+                // Do nothing
+            }
         }
     }
 

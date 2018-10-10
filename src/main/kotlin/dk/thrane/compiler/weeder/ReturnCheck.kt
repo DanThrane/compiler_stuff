@@ -33,6 +33,10 @@ class ReturnCheck : Visitor() {
                             "${node.lineNumber}")
                 }
             }
+
+            else -> {
+                // Do nothing
+            }
         }
     }
 

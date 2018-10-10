@@ -3,9 +3,9 @@ package dk.thrane.compiler.ast
 import dk.thrane.compiler.ast.Tokens.*
 import java.util.*
 
-class Parser() {
+class Parser {
     fun parse(source: String): SourceFileNode {
-        var cursor = Cursor(source)
+        val cursor = Cursor(source)
         return SourceFileNode(0, program(cursor))
     }
 
@@ -28,8 +28,8 @@ class Parser() {
     private fun functionHead(cursor: Cursor): FunctionHead {
         Tokens.consume(T_FUNCTION, cursor)
         val lineNumber = cursor.lineNumber
-        var id = Tokens.consume(T_ID, cursor)
-        var parameters = ArrayList<FieldDeclarationNode>()
+        val id = Tokens.consume(T_ID, cursor)
+        val parameters = ArrayList<FieldDeclarationNode>()
 
         Tokens.consume(T_LEFT_PARENTHESIS, cursor)
         variableDeclarationList(cursor, parameters)
@@ -59,11 +59,11 @@ class Parser() {
     }
 
     private fun variableDeclarationList(cursor: Cursor, list: MutableList<FieldDeclarationNode>) {
-        var next = Tokens.nextToken(cursor, false)
+        val next = Tokens.nextToken(cursor, false)
         val lineNumber = cursor.lineNumber
         when (next.tokenType) {
             T_ID -> {
-                var id = Tokens.consume(T_ID, cursor)
+                val id = Tokens.consume(T_ID, cursor)
                 Tokens.consume(T_COLON, cursor)
                 val typeNode = type(cursor)
                 list.add(FieldDeclarationNode(lineNumber, id.image, typeNode))
@@ -76,18 +76,18 @@ class Parser() {
     }
 
     private fun type(cursor: Cursor): TypeNode {
-        var next = Tokens.nextToken(cursor)
+        val next = Tokens.nextToken(cursor)
         val lineNumber = cursor.lineNumber
-        when (next.tokenType) {
-            T_INT, T_BOOL, T_CHAR -> return TypeNode(lineNumber, next.tokenType)
-            T_ID -> return IdentifierType(lineNumber, ((next.value as String?)!!))
-            T_ARRAY -> return ArrayTypeNode(lineNumber, type(cursor))
+        return when (next.tokenType) {
+            T_INT, T_BOOL, T_CHAR -> PrimitiveTypeNode(lineNumber, next.tokenType)
+            T_ID -> IdentifierType(lineNumber, ((next.value as String?)!!))
+            T_ARRAY -> ArrayTypeNode(lineNumber, type(cursor))
             T_RECORD -> {
                 val fields = ArrayList<FieldDeclarationNode>()
                 Tokens.consume(T_LEFT_CURLY_BRACE, cursor)
                 variableDeclarationList(cursor, fields)
                 Tokens.consume(T_RIGHT_CURLY_BRACE, cursor)
-                return RecordTypeNode(lineNumber, fields)
+                RecordTypeNode(lineNumber, fields)
             }
             else -> throw IllegalStateException("Unexpected token '${next.tokenType}'. Expected a type here. " +
                     "At ${cursor.remainingString}")
@@ -97,7 +97,7 @@ class Parser() {
     private fun functionTail(cursor: Cursor): FunctionTail {
         val lineNumber = cursor.lineNumber
         Tokens.consume(T_END, cursor)
-        var id = Tokens.consume(T_ID, cursor)
+        val id = Tokens.consume(T_ID, cursor)
         return FunctionTail(lineNumber, id.image)
     }
 
@@ -227,7 +227,7 @@ class Parser() {
         var result = left
 
         while (op != null && op.precedense >= minPrecedence) {
-            var oldOp = op
+            val oldOp = op
             Tokens.nextToken(cursor, true)
             var rhs: ExpressionNode = TermExpressionNode(lineNumber, term(cursor))
             lookahead = Tokens.nextToken(cursor, false)
@@ -238,20 +238,20 @@ class Parser() {
                 op = findOperator(lookahead.tokenType)
             }
 
-            when (oldOp) {
-                Operator.MULTIPLICATION -> result = MultiplicationNode(lineNumber, left, rhs)
-                Operator.DIVISION -> result = DivisionNode(lineNumber, left, rhs)
-                Operator.MODULO -> result = ModuloNode(lineNumber, left, rhs)
-                Operator.ADD -> result = AddNode(lineNumber, left, rhs)
-                Operator.MINUS -> result = MinusNode(lineNumber, left, rhs)
-                Operator.COMPARE_LESS_THAN -> result = CompareLessThanNode(lineNumber, left, rhs)
-                Operator.COMPARE_GREATER_THAN -> result = CompareGreaterThanNode(lineNumber, left, rhs)
-                Operator.COMPARE_LESS_THAN_OR_EQUALS -> result = CompareLessThanOrEqualsNode(lineNumber, left, rhs)
-                Operator.COMPARE_GREATER_THAN_OR_EQUALS -> result = CompareGreaterThanOrEqualsNode(lineNumber, left, rhs)
-                Operator.COMPARE_EQUAL -> result = CompareEqualNode(lineNumber, left, rhs)
-                Operator.COMPARE_NOT_EQUAL -> result = CompareNotEqualNode(lineNumber, left, rhs)
-                Operator.AND -> result = AndNode(lineNumber, left, rhs)
-                Operator.OR -> result = OrNode(lineNumber, left, rhs)
+            result = when (oldOp) {
+                Operator.MULTIPLICATION -> MultiplicationNode(lineNumber, left, rhs)
+                Operator.DIVISION -> DivisionNode(lineNumber, left, rhs)
+                Operator.MODULO -> ModuloNode(lineNumber, left, rhs)
+                Operator.ADD -> AddNode(lineNumber, left, rhs)
+                Operator.MINUS -> MinusNode(lineNumber, left, rhs)
+                Operator.COMPARE_LESS_THAN -> CompareLessThanNode(lineNumber, left, rhs)
+                Operator.COMPARE_GREATER_THAN -> CompareGreaterThanNode(lineNumber, left, rhs)
+                Operator.COMPARE_LESS_THAN_OR_EQUALS -> CompareLessThanOrEqualsNode(lineNumber, left, rhs)
+                Operator.COMPARE_GREATER_THAN_OR_EQUALS -> CompareGreaterThanOrEqualsNode(lineNumber, left, rhs)
+                Operator.COMPARE_EQUAL -> CompareEqualNode(lineNumber, left, rhs)
+                Operator.COMPARE_NOT_EQUAL -> CompareNotEqualNode(lineNumber, left, rhs)
+                Operator.AND -> AndNode(lineNumber, left, rhs)
+                Operator.OR -> OrNode(lineNumber, left, rhs)
             }
         }
         return result
@@ -329,9 +329,9 @@ class Parser() {
 
     private fun termLookahead(cursor: Cursor): Boolean {
         val next = Tokens.nextToken(cursor, false)
-        when (next.tokenType) {
-            T_ID, T_LEFT_PARENTHESIS, T_BANG, T_VERTICAL_BAR, T_NUM, T_TRUE, T_FALSE, T_NULL -> return true
-            else -> return false
+        return when (next.tokenType) {
+            T_ID, T_LEFT_PARENTHESIS, T_BANG, T_VERTICAL_BAR, T_NUM, T_TRUE, T_FALSE, T_NULL -> true
+            else -> false
         }
     }
 
@@ -343,19 +343,19 @@ class Parser() {
     private fun variableRecursion(cursor: Cursor, variableAccessNode: VariableAccessNode): VariableNode? {
         val next = Tokens.nextToken(cursor, false)
         val lineNumber = cursor.lineNumber
-        when (next.tokenType) {
+        return when (next.tokenType) {
             T_LEFT_SQUARE_BRACE -> {
                 Tokens.consume(T_LEFT_SQUARE_BRACE, cursor)
                 val expr = expression(cursor)
                 Tokens.consume(T_RIGHT_SQUARE_BRACE, cursor)
-                return ArrayAccessNode(lineNumber, variableAccessNode, expr)
+                ArrayAccessNode(lineNumber, variableAccessNode, expr)
             }
             T_DOT -> {
                 Tokens.consume(T_DOT, cursor)
                 val id = Tokens.consume(T_ID, cursor)
-                return FieldAccessNode(lineNumber, variableAccessNode, id.image)
+                FieldAccessNode(lineNumber, variableAccessNode, id.image)
             }
-            else -> return null
+            else -> null
         }
     }
 }

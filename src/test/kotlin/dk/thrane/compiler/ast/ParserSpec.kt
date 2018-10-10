@@ -41,9 +41,6 @@ class ParserSpec {
         // The the parameter types
 //        assertEquals(head.parameters.map { it.typeNode }, listOf(T_INT, T_BOOL, T_CHAR, T_ARRAY, T_ARRAY, T_RECORD,
 //                T_ARRAY))
-        assertTrue(head.parameters[0].typeNode is TypeNode)
-        assertTrue(head.parameters[1].typeNode is TypeNode)
-        assertTrue(head.parameters[2].typeNode is TypeNode)
         assertTrue(head.parameters[3].typeNode is ArrayTypeNode)
         assertTrue(head.parameters[4].typeNode is ArrayTypeNode)
         assertTrue(head.parameters[5].typeNode is RecordTypeNode)
