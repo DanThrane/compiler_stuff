@@ -1,3 +1,5 @@
+#### Note, as the language goal is to provide a danish programming language, everything is subject to change.
+
 # DanskDiego
 
 DanskDiego is an imperative, procedural language, providing the world with a way to program in danish.
@@ -51,13 +53,14 @@ A record is similar to a C-struct, and uses the keywords `record of` to define. 
 var rec: record of { a: int, b: bool };
 ```
 
-*__HELP WANTED: DOES RECORDS NEED TO BE ALLOCATED?__*
-
-*__HELP WANTED: DOES RECORDS NEED TO BE ALLOCATED?__*
-
-*__HELP WANTED: DOES RECORDS NEED TO BE ALLOCATED?__*
-
 Which creates a structure with the children being accessible through `.`, e.g. `rec.a` or `rec.b`.
+
+Like arrays, records will need to be allocated, which is done similarly to arrays, but without the size:
+
+```
+var rec: record of { a: int, b: bool };
+allocate rec;
+```
 
 ## Functions
 
