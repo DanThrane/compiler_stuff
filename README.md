@@ -83,6 +83,32 @@ Calling the function is done like most C-like programming languages:
 returnMe(5);
 ```
 
-## TODO - HELLO WORLD
+## Array length and absolute value
+
+To retrieve the length of an array, the pipe operator can be used:
+
+```
+var length: int, arr: array of int;
+allocate arr of length 5;
+length = |arr|;
+write length; // 5
+```
+
+Additionally, the pipe operator can also be used on an integer to get the absolute value, e.g:
+
+```
+var a: int;
+a = 0-5;
+write |a|; // 5
+```
+
+## Hello World
+
+The Hello World-program in DanskDiego is done using the primitive `write`, and can be done at the top level:
+
+```
+write "Hello, World!";
+```
+
 
 ## TODO - GRAMMAR
