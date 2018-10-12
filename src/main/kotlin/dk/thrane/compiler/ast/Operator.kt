@@ -1,5 +1,6 @@
 package dk.thrane.compiler.ast
 
+@Suppress("MagicNumber")
 enum class Operator(val token: Tokens, val rightAssociativite: Boolean, val precedense: Int) {
     MULTIPLICATION(Tokens.T_MULTIPLICATION, false, 7),
     DIVISION(Tokens.T_DIVISION, false, 7),

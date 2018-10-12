@@ -6,33 +6,10 @@ import dk.thrane.compiler.weeder.ReturnCheck
 import java.nio.file.Files
 import java.nio.file.Paths
 
-class FunctionCheck : Visitor() {
-    override fun enterNode(node: Node) {
-        when (node) {
-            is FunctionNode -> {
-                if (node.head.name != node.tail.name) {
-                    throw IllegalStateException(
-                        "Name in head of function does not match name in tail of function!" +
-                                " Head defined at line ${node.head.lineNumber}, tail at line ${node.tail.lineNumber}"
-                    )
-                }
-                visitChildren = false
-            }
-
-            else -> {
-                // Do nothing
-            }
-        }
-    }
-
-    override fun exitNode(node: Node) {
-    }
-}
-
 fun main(args: Array<String>) {
     println("Hello!")
 
-    val source = Files.readAllLines(Paths.get("./programs", "operators.die")).joinToString("\n")
+    val source = Files.readAllLines(Paths.get("./programs", "nested.die")).joinToString("\n")
     val parser = Parser()
     val functionChecker = FunctionCheck()
     val gatherer = SymbolGatherer()

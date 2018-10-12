@@ -3,6 +3,7 @@ package dk.thrane.compiler.ast
 import dk.thrane.compiler.ast.Tokens.*
 import java.util.*
 
+@Suppress("TooManyFunctions", "LargeClass")
 class Parser {
     fun parse(source: String): SourceFileNode {
         val cursor = Cursor(source)
@@ -45,7 +46,7 @@ class Parser {
         val declarations = ArrayList<DeclarationNode>()
         val statements = ArrayList<StatementNode>()
 
-        outer@while (true) {
+        outer@ while (true) {
             val next = Tokens.nextToken(cursor, false)
             when (next.tokenType) {
                 T_VAR, T_TYPE, T_FUNCTION -> declarations.add(declaration(cursor))
@@ -89,8 +90,10 @@ class Parser {
                 Tokens.consume(T_RIGHT_CURLY_BRACE, cursor)
                 RecordTypeNode(lineNumber, fields)
             }
-            else -> throw IllegalStateException("Unexpected token '${next.tokenType}'. Expected a type here. " +
-                    "At ${cursor.remainingString}")
+            else -> throw IllegalStateException(
+                "Unexpected token '${next.tokenType}'. Expected a type here. " +
+                        "At ${cursor.remainingString}"
+            )
         }
     }
 
@@ -114,6 +117,7 @@ class Parser {
                 Tokens.consume(T_SEMI_COLON, cursor)
                 return TypeDeclarationNode(lineNumber, id.image, type)
             }
+
             T_VAR -> {
                 val variables = ArrayList<FieldDeclarationNode>()
                 Tokens.consume(T_VAR, cursor)
@@ -121,8 +125,15 @@ class Parser {
                 Tokens.consume(T_SEMI_COLON, cursor)
                 return VariableDeclarationNode(lineNumber, variables)
             }
-            else -> throw IllegalStateException("Unexpected token ${next.tokenType}. Expected one of, $T_TYPE, " +
-                    "$T_VAR, $T_FUNCTION. At line ${cursor.lineNumber}")
+
+            T_FUNCTION -> {
+                return function(cursor)
+            }
+
+            else -> throw IllegalStateException(
+                "Unexpected token ${next.tokenType}. Expected one of, $T_TYPE, " +
+                        "$T_VAR, $T_FUNCTION. At line ${cursor.lineNumber}"
+            )
         }
     }
 
@@ -178,7 +189,7 @@ class Parser {
             T_LEFT_CURLY_BRACE -> {
                 Tokens.consume(T_LEFT_CURLY_BRACE, cursor)
                 val statements = ArrayList<StatementNode>()
-                outer@while (true) {
+                outer@ while (true) {
                     if (statementLookahead(cursor)) {
                         statements.add(statement(cursor))
                     } else {
@@ -195,8 +206,10 @@ class Parser {
                 Tokens.consume(T_SEMI_COLON, cursor)
                 return AssignmentNode(lineNumber, variable, expr)
             }
-            else -> throw IllegalStateException("Unexpected token while parsing statement, got ${next.tokenType}. " +
-                    "At line ${cursor.lineNumber}")
+            else -> throw IllegalStateException(
+                "Unexpected token while parsing statement, got ${next.tokenType}. " +
+                        "At line ${cursor.lineNumber}"
+            )
         }
     }
 
@@ -238,21 +251,7 @@ class Parser {
                 op = findOperator(lookahead.tokenType)
             }
 
-            result = when (oldOp) {
-                Operator.MULTIPLICATION -> MultiplicationNode(lineNumber, left, rhs)
-                Operator.DIVISION -> DivisionNode(lineNumber, left, rhs)
-                Operator.MODULO -> ModuloNode(lineNumber, left, rhs)
-                Operator.ADD -> AddNode(lineNumber, left, rhs)
-                Operator.MINUS -> MinusNode(lineNumber, left, rhs)
-                Operator.COMPARE_LESS_THAN -> CompareLessThanNode(lineNumber, left, rhs)
-                Operator.COMPARE_GREATER_THAN -> CompareGreaterThanNode(lineNumber, left, rhs)
-                Operator.COMPARE_LESS_THAN_OR_EQUALS -> CompareLessThanOrEqualsNode(lineNumber, left, rhs)
-                Operator.COMPARE_GREATER_THAN_OR_EQUALS -> CompareGreaterThanOrEqualsNode(lineNumber, left, rhs)
-                Operator.COMPARE_EQUAL -> CompareEqualNode(lineNumber, left, rhs)
-                Operator.COMPARE_NOT_EQUAL -> CompareNotEqualNode(lineNumber, left, rhs)
-                Operator.AND -> AndNode(lineNumber, left, rhs)
-                Operator.OR -> OrNode(lineNumber, left, rhs)
-            }
+            result = BinaryExpressionNode(lineNumber, left, rhs, oldOp)
         }
         return result
     }
@@ -322,8 +321,10 @@ class Parser {
                 Tokens.consume(T_NULL, cursor)
                 return NullLiteralNode(lineNumber)
             }
-            else -> throw IllegalStateException("Unexpected token encountered (${peek[0].tokenType}) when parsing " +
-                    "term. At line $lineNumber")
+            else -> throw IllegalStateException(
+                "Unexpected token encountered (${peek[0].tokenType}) when parsing " +
+                        "term. At line $lineNumber"
+            )
         }
     }
 
