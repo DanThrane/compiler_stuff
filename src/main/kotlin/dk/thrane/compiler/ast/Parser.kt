@@ -71,6 +71,7 @@ class Parser {
                 Tokens.optionallyConsume(T_COMMA, cursor)
                 variableDeclarationList(cursor, list)
             }
+
             else -> {
             }
         }
@@ -81,8 +82,11 @@ class Parser {
         val lineNumber = cursor.lineNumber
         return when (next.tokenType) {
             T_INT, T_BOOL, T_CHAR -> PrimitiveTypeNode(lineNumber, next.tokenType)
+
             T_ID -> IdentifierType(lineNumber, ((next.value as String?)!!))
+
             T_ARRAY -> ArrayTypeNode(lineNumber, type(cursor))
+
             T_RECORD -> {
                 val fields = ArrayList<FieldDeclarationNode>()
                 Tokens.consume(T_LEFT_CURLY_BRACE, cursor)
@@ -90,6 +94,7 @@ class Parser {
                 Tokens.consume(T_RIGHT_CURLY_BRACE, cursor)
                 RecordTypeNode(lineNumber, fields)
             }
+
             else -> throw IllegalStateException(
                 "Unexpected token '${next.tokenType}'. Expected a type here. " +
                         "At ${cursor.remainingString}"
@@ -148,12 +153,14 @@ class Parser {
                 Tokens.consume(T_SEMI_COLON, cursor)
                 return ReturnNode(lineNumber, expr)
             }
+
             T_WRITE -> {
                 Tokens.consume(T_WRITE, cursor)
                 val expr = expression(cursor)
                 Tokens.consume(T_SEMI_COLON, cursor)
                 return WriteNode(lineNumber, expr)
             }
+
             T_ALLOC -> {
                 Tokens.consume(T_ALLOC, cursor)
                 val variable = variable(cursor)
@@ -166,6 +173,7 @@ class Parser {
                 Tokens.consume(T_SEMI_COLON, cursor)
                 return AllocNode(lineNumber, variable, lengthExpression)
             }
+
             T_IF -> {
                 Tokens.consume(T_IF, cursor)
                 val expr = expression(cursor)
@@ -179,6 +187,7 @@ class Parser {
                 }
                 return IfNode(lineNumber, expr, statement, elseStatement)
             }
+
             T_WHILE -> {
                 Tokens.consume(T_WHILE, cursor)
                 val expr = expression(cursor)
@@ -186,6 +195,7 @@ class Parser {
                 val statement = statement(cursor)
                 return WhileNode(lineNumber, expr, statement)
             }
+
             T_LEFT_CURLY_BRACE -> {
                 Tokens.consume(T_LEFT_CURLY_BRACE, cursor)
                 val statements = ArrayList<StatementNode>()
@@ -199,6 +209,7 @@ class Parser {
                 Tokens.consume(T_RIGHT_CURLY_BRACE, cursor)
                 return BlockNode(lineNumber, statements)
             }
+
             T_ID -> {
                 val variable = variable(cursor)
                 Tokens.consume(T_ASSIGNMENT, cursor)
@@ -206,6 +217,7 @@ class Parser {
                 Tokens.consume(T_SEMI_COLON, cursor)
                 return AssignmentNode(lineNumber, variable, expr)
             }
+
             else -> throw IllegalStateException(
                 "Unexpected token while parsing statement, got ${next.tokenType}. " +
                         "At line ${cursor.lineNumber}"
@@ -215,9 +227,9 @@ class Parser {
 
     private fun statementLookahead(cursor: Cursor): Boolean {
         val peek = Tokens.nextToken(cursor, false)
-        when (peek.tokenType) {
-            T_RETURN, T_WRITE, T_ALLOC, T_IF, T_WHILE, T_ID -> return true
-            else -> return false
+        return when (peek.tokenType) {
+            T_RETURN, T_WRITE, T_ALLOC, T_IF, T_WHILE, T_ID -> true
+            else -> false
         }
     }
 
@@ -226,10 +238,8 @@ class Parser {
     }
 
     private fun expression(cursor: Cursor): ExpressionNode {
-        val lineNumber = cursor.lineNumber
-        val left = TermExpressionNode(lineNumber, term(cursor))
-        val combined = expressionRecursion(cursor, left, 0)
-        return combined
+        val left = term(cursor)
+        return expressionRecursion(cursor, left, 0)
     }
 
 
@@ -242,7 +252,7 @@ class Parser {
         while (op != null && op.precedense >= minPrecedence) {
             val oldOp = op
             Tokens.nextToken(cursor, true)
-            var rhs: ExpressionNode = TermExpressionNode(lineNumber, term(cursor))
+            var rhs: ExpressionNode = term(cursor)
             lookahead = Tokens.nextToken(cursor, false)
             op = findOperator(lookahead.tokenType)
             while (op != null && op.precedense > oldOp.precedense) {
@@ -268,59 +278,67 @@ class Parser {
         return list
     }
 
-    private fun term(cursor: Cursor): TermNode {
+    private fun term(cursor: Cursor): ExpressionNode {
         val peek = Tokens.peek(cursor, 2)
         val lineNumber = cursor.lineNumber
         when (peek[0].tokenType) {
             T_ID -> {
-                when (peek[1].tokenType) {
+                return when (peek[1].tokenType) {
                     T_LEFT_PARENTHESIS -> {
                         val id = Tokens.consume(T_ID, cursor)
                         Tokens.consume(T_LEFT_PARENTHESIS, cursor)
                         val arguments = expressionList(cursor)
                         Tokens.consume(T_RIGHT_PARENTHESIS, cursor)
-                        return FunctionCallNode(lineNumber, id.image, arguments)
+                        FunctionCallNode(lineNumber, id.image, arguments)
                     }
                     else -> {
-                        return VariableTermNode(lineNumber, variable(cursor))
+                        VariableTermNode(lineNumber, variable(cursor))
                     }
                 }
             }
+
             T_LEFT_PARENTHESIS -> {
                 Tokens.consume(T_LEFT_PARENTHESIS, cursor)
                 val expr = expression(cursor)
                 Tokens.consume(T_RIGHT_PARENTHESIS, cursor)
-                return ParenthesisTermNode(lineNumber, expr)
+                return expr
             }
+
             T_BANG -> {
                 Tokens.consume(T_BANG, cursor)
                 val term = term(cursor)
                 return NegationNode(lineNumber, term)
             }
+
             T_VERTICAL_BAR -> {
                 Tokens.consume(T_VERTICAL_BAR, cursor)
                 val expr = expression(cursor)
                 Tokens.consume(T_VERTICAL_BAR, cursor)
                 return AbsoluteNode(lineNumber, expr)
             }
+
             T_NUM -> {
                 // The regex should keep us safe here
                 val number = Tokens.consume(T_NUM, cursor)
                 val value = Integer.parseInt(number.image)
                 return NumberLiteralNode(lineNumber, value)
             }
+
             T_TRUE -> {
                 Tokens.consume(T_TRUE, cursor)
                 return BooleanLiteralNode(lineNumber, true)
             }
+
             T_FALSE -> {
                 Tokens.consume(T_FALSE, cursor)
                 return BooleanLiteralNode(lineNumber, false)
             }
+
             T_NULL -> {
                 Tokens.consume(T_NULL, cursor)
                 return NullLiteralNode(lineNumber)
             }
+
             else -> throw IllegalStateException(
                 "Unexpected token encountered (${peek[0].tokenType}) when parsing " +
                         "term. At line $lineNumber"
@@ -351,11 +369,13 @@ class Parser {
                 Tokens.consume(T_RIGHT_SQUARE_BRACE, cursor)
                 ArrayAccessNode(lineNumber, variableAccessNode, expr)
             }
+
             T_DOT -> {
                 Tokens.consume(T_DOT, cursor)
                 val id = Tokens.consume(T_ID, cursor)
                 FieldAccessNode(lineNumber, variableAccessNode, id.image)
             }
+
             else -> null
         }
     }

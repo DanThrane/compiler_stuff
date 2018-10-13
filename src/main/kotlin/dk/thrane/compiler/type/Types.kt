@@ -5,7 +5,7 @@ import java.util.*
 open class Type {
     companion object {
         fun checkCompatibility(theLeft: Type, theRight: Type): Boolean {
-            var currentLeft = theLeft
+            val currentLeft = theLeft
             var currentRight = theRight
 
             if (currentLeft !is TypeLike) currentRight = fullyResolve(currentRight)
@@ -30,7 +30,7 @@ open class Type {
                     if (currentRight is TypeNull) return true
                     if (currentRight !is TypeRecord) return false
                     if (currentLeft.fieldTypes.size != currentRight.fieldTypes.size) return false
-                    for (i in 0..currentLeft.fieldTypes.size - 1) {
+                    for (i in 0 until currentLeft.fieldTypes.size) {
                         val leftField = currentLeft.fieldTypes[i]
                         val rightField = currentRight.fieldTypes[i]
                         if (leftField.first != rightField.first ||
@@ -62,11 +62,12 @@ open class Type {
     }
 }
 
-class TypeInt : Type()
-class TypeBool : Type()
-class TypeChar : Type()
-class TypeNull : Type()
-class TypeUnit : Type()
+object TypeInt : Type()
+object TypeBool : Type()
+object TypeChar : Type()
+object TypeNull : Type()
+object TypeUnit : Type()
+
 class TypeRecord(val fieldTypes: List<Pair<String, Type>>) : Type()
 class TypeArray(val type: Type) : Type()
 class TypeFunction(val parameterTypes: List<Pair<String, Type>>, val returnType: Type) : Type()

@@ -489,7 +489,7 @@ style:
   UtilityClassWithPublicConstructor:
     active: false
   VarCouldBeVal:
-    active: false
+    active: true
   WildcardImport:
     active: true
     excludeImports: 'java.util.*,kotlinx.android.synthetic.*,dk.thrane.compiler.ast.Tokens.*'
