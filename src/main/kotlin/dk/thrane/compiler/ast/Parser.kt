@@ -242,7 +242,6 @@ class Parser {
         return expressionRecursion(cursor, left, 0)
     }
 
-
     private fun expressionRecursion(cursor: Cursor, left: ExpressionNode, minPrecedence: Int): ExpressionNode {
         val lineNumber = cursor.lineNumber
         var lookahead = Tokens.nextToken(cursor, false)

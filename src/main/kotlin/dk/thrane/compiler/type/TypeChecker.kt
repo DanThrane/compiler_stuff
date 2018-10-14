@@ -48,7 +48,7 @@ class TypeChecker : Visitor() {
             is NullLiteralNode -> node.type = TypeNull
             is VariableTermNode -> node.type = node.variableNode.type
             is FunctionCallNode -> {
-                val symbol = node.scope!!.getSymbolAndLevels(node.name) ?: throw IllegalStateException(
+                val symbol = node.scope.getSymbolAndLevels(node.name) ?: throw IllegalStateException(
                     "Function of name ${node.name} not found at line " +
                             "${node.lineNumber}"
                 )
@@ -59,6 +59,7 @@ class TypeChecker : Visitor() {
                                 "a function."
                     )
                 }
+
                 // NOTE: We should really have a way of locking an object, such that its value may no longer change
                 val functionType = symbol.first.type as TypeFunction
                 if (node.arguments.size != functionType.parameterTypes.size) {
@@ -149,7 +150,7 @@ class TypeChecker : Visitor() {
     private fun checkVariableNode(node: VariableNode) {
         when (node) {
             is VariableAccessNode -> {
-                val symbol = node.scope!!.getSymbolAndLevels(node.identifier)!!.first
+                val symbol = node.scope.getSymbolAndLevels(node.identifier)!!.first
                 node.type = symbol.type
             }
             is ArrayAccessNode -> {
@@ -177,7 +178,9 @@ class TypeChecker : Visitor() {
     private fun checkStatementNode(node: StatementNode) {
         when (node) {
             is ReturnNode -> {
-                val returnType = node.scope!!.function!!.returnType
+                val scope = (node.scope as FunctionScope)
+
+                val returnType = scope.function.returnType
                 if (!Type.checkCompatibility(returnType, node.expression.type)) {
                     throw IllegalStateException(
                         "Expected function to return $returnType, but instead got " +
@@ -185,6 +188,7 @@ class TypeChecker : Visitor() {
                     )
                 }
             }
+
             is WriteNode -> {
                 when (node.expression.type) {
                     is TypeInt, is TypeBool -> {
@@ -192,6 +196,7 @@ class TypeChecker : Visitor() {
                     else -> throw IllegalStateException("Write not supported for this type: ${node.expression.type}}")
                 }
             }
+
             is AllocNode -> {
                 val varType = Type.fullyResolve(node.variable.type)
                 when (varType) {
@@ -217,11 +222,13 @@ class TypeChecker : Visitor() {
                     }
                 }
             }
+
             is AssignmentNode -> {
                 if (!Type.checkCompatibility(node.variable.type, node.expression.type)) {
                     throw IllegalStateException("Expected ${node.variable.type}, but got ${node.expression.type}")
                 }
             }
+
             is IfNode -> {
                 if (!Type.checkCompatibility(TypeBool, node.expression.type)) {
                     throw IllegalStateException(
@@ -230,6 +237,7 @@ class TypeChecker : Visitor() {
                     )
                 }
             }
+
             is WhileNode -> {
                 if (!Type.checkCompatibility(TypeBool, node.expression.type)) {
                     throw IllegalStateException(
@@ -238,6 +246,7 @@ class TypeChecker : Visitor() {
                     )
                 }
             }
+
             is BlockNode -> {
             }
         }

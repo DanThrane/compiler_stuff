@@ -1,6 +1,6 @@
 package dk.thrane.compiler.ast
 
-import dk.thrane.compiler.type.SymbolTable
+import dk.thrane.compiler.type.Scope
 import dk.thrane.compiler.type.Type
 import dk.thrane.compiler.type.TypeArray
 import dk.thrane.compiler.type.TypeBool
@@ -15,7 +15,8 @@ sealed class Node {
     val serialNumber = serialNumberCounter.getAndIncrement()
 
     abstract val lineNumber: Int
-    var scope: SymbolTable? = null
+    lateinit var scope: Scope
+
     open val children: List<Node>
         get() = emptyList()
 

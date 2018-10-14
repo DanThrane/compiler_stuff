@@ -9,11 +9,13 @@ import dk.thrane.compiler.ast.VariableDeclarationNode
 import dk.thrane.compiler.ast.Visitor
 
 class SymbolGatherer : Visitor() {
-    val global: SymbolTable = SymbolTable()
-    private var currentScope: SymbolTable = global
+    val global = GlobalScope()
+    private var currentScope: Scope = global
 
-    private fun enterScope() {
-        currentScope = currentScope.scopeSymbolTable()
+    private fun <T : Scope> enterScope(companion: ScopeCompanion<T>): T {
+        val scopeSymbolTable = currentScope.scopeSymbolTable(companion)
+        currentScope = scopeSymbolTable
+        return scopeSymbolTable
     }
 
     private fun exitScope() {
@@ -32,8 +34,8 @@ class SymbolGatherer : Visitor() {
                 val returnType = if (node.head.typeNode != null) node.head.typeNode!!.toNativeType() else TypeUnit
                 val typeFunction = TypeFunction(parameterTypes, returnType)
                 currentScope.putSymbol(node.head.name, typeFunction)
-                enterScope()
-                currentScope.function = typeFunction
+                val functionScope = enterScope(FunctionScope)
+                functionScope.function = typeFunction
                 currentScope.putSymbol("#return", returnType)
                 node.function = typeFunction
             }
@@ -49,7 +51,7 @@ class SymbolGatherer : Visitor() {
             }
 
             is RecordTypeNode -> {
-                enterScope()
+                enterScope(RecordScope)
             }
 
             else -> {
