@@ -26,6 +26,10 @@ Multiple variables can be instantiated on the same line, by separating using a c
 var a: int, b: bool, c: char;
 ```
 
+## Type
+
+The keyword `type` can be used to define a type. E.g. `type id = int;` would alias `id` to the `int` data type.
+
 ## Collections
 
 DanskDiego supports `arrays`, and `records`. To define an array, prefix the type with `array of`, e.g.
@@ -62,6 +66,14 @@ var rec: record of { a: int, b: bool };
 allocate rec;
 ```
 
+Records can be defined using the `type` keyword, e.g. for creation of binary trees:
+
+```
+type Node = record { leftChild: Node, rightChild: Node, key: int };
+```
+
+Which defines a node of a binary tree.
+
 ## Functions
 
 Defining a function is done using the `func` keyword. A function must have a name and a return type, and be terminated 
@@ -75,12 +87,12 @@ func returnInteger(a: int): int
 end returnInteger
 ```
 
-which defines the function `returnMe` which takes a single argument, an integer.
+which defines the function `returnInteger` which takes a single argument, an integer.
 
 Calling the function is done like most C-like programming languages:
 
 ```
-returnMe(5);
+returnInteger(5);
 ```
 
 ## Array length and absolute value
@@ -102,6 +114,39 @@ a = 0-5;
 write |a|; // 5
 ```
 
+## Comparisons
+
+DanskDiego has `true` and `false` as boolean constants, and `null` for usage with records or arrays.
+
+Equality operators in Diego are similar to most other imperative languages, being `==` for equality, `!=` for inequality.
+Additionally, the language has `<`, `>`, `<=`, `>=` for equality checks.
+
+## Control flow
+
+### If-statements
+
+If-statements in DanskDiego can be followed a else-statement, or have the else omitted. The predicate must be enclosed by
+a parenthesis. Predicates can be chained using the `&&` or the `||` operators.
+
+```
+if (i == 0) write 1;
+else write 0; // Can be omitted
+```
+
+If-statements can contain either a single statement or statement list (enclosed by curly braces).
+
+### While loops
+
+While loops syntax require a predicate, similar to if statements, but the predicate is followed by the keyword `do`, e.g.:
+
+```
+var i: int;
+i = 5;
+while (i < 5) do write i;
+```
+
+The body of a while statement can either be a single statement, or list of statements.
+
 ## Hello World
 
 The Hello World-program in DanskDiego is done using the primitive `write`, and can be done at the top level:
@@ -110,5 +155,31 @@ The Hello World-program in DanskDiego is done using the primitive `write`, and c
 write "Hello, World!";
 ```
 
+## Binary tree traversal
 
-## TODO - GRAMMAR
+```
+type Node = record of { leftChild: Node, rightChild: Node, key: int };
+func initNode(key: int, leftChild: Node, rightChild: Node): Node
+    var n: Node;
+    n.key = key;
+    n.leftChild = leftChild;
+    n.rightChild = rightChild;
+    return n;
+end initNode
+
+var leftChild: Node, rightChild: Node, root: Node;
+leftChild = initNode(1, null, null);
+rightChild = initNode(2, null, null);
+root = initNode(0, leftChild, rightChild);
+
+func sumKeys(node: Node): int
+    var keyValue: int;
+    keyValue = 0;
+    if (node.leftChild != null) keyValue = keyValue + sumKeys(node.leftChild);
+    if (node.rightChild != null) keyValue = keyValue + sumKeys(node.rightChild);
+    return keyValue + node.key;
+end sumKeys
+
+write sumKeys(root); // 3
+```
+
