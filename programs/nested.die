@@ -1,7 +1,10 @@
 func foobar(a: int): int
-    func nested(b: int)
+    var temp: int;
+    func nested(b: int): int
         write b;
+        return 0;
     end nested
 
+    temp = nested(42);
     return 1;
 end foobar

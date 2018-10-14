@@ -48,7 +48,7 @@ class TypeChecker : Visitor() {
             is NullLiteralNode -> node.type = TypeNull
             is VariableTermNode -> node.type = node.variableNode.type
             is FunctionCallNode -> {
-                val symbol = node.scope.getSymbolAndLevels(node.name) ?: throw IllegalStateException(
+                val symbol = node.scope.getSymbolAndLevelsOrNull(node.name) ?: throw IllegalStateException(
                     "Function of name ${node.name} not found at line " +
                             "${node.lineNumber}"
                 )
@@ -150,7 +150,7 @@ class TypeChecker : Visitor() {
     private fun checkVariableNode(node: VariableNode) {
         when (node) {
             is VariableAccessNode -> {
-                val symbol = node.scope.getSymbolAndLevels(node.identifier)!!.first
+                val symbol = node.scope.getSymbolAndLevels(node.identifier).first
                 node.type = symbol.type
             }
             is ArrayAccessNode -> {

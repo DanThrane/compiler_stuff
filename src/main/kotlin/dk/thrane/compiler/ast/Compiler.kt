@@ -10,7 +10,7 @@ import java.nio.file.Paths
 fun main(args: Array<String>) {
     println("Hello!")
 
-    val source = Files.readAllLines(Paths.get("./programs", "paranthesis.die")).joinToString("\n")
+    val source = Files.readAllLines(Paths.get("./programs", "nested.die")).joinToString("\n")
     val parser = Parser()
     val functionChecker = FunctionCheck()
     val gatherer = SymbolGatherer()

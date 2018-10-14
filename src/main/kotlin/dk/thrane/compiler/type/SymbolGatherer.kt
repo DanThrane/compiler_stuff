@@ -26,28 +26,30 @@ class SymbolGatherer : Visitor() {
         node.scope = currentScope
         when (node) {
             is TypeDeclarationNode -> {
-                currentScope.putSymbol(node.name, node.typeNode.toNativeType())
+                currentScope[node.name] = node.typeNode.toNativeType()
             }
 
             is FunctionNode -> {
                 val parameterTypes = node.head.parameters.map { Pair(it.name, it.typeNode.toNativeType()) }
                 val returnType = if (node.head.typeNode != null) node.head.typeNode!!.toNativeType() else TypeUnit
                 val typeFunction = TypeFunction(parameterTypes, returnType)
-                currentScope.putSymbol(node.head.name, typeFunction)
+                currentScope[node.head.name] = typeFunction
+
                 val functionScope = enterScope(FunctionScope)
                 functionScope.function = typeFunction
-                currentScope.putSymbol("#return", returnType)
+                functionScope["#return"] = returnType
+
                 node.function = typeFunction
             }
 
             is VariableDeclarationNode -> {
                 node.variables.forEach {
-                    currentScope.putSymbol(it.name, it.typeNode.toNativeType())
+                    currentScope[it.name] = it.typeNode.toNativeType()
                 }
             }
 
             is FieldDeclarationNode -> {
-                currentScope.putSymbol(node.name, node.typeNode.toNativeType())
+                currentScope[node.name] = node.typeNode.toNativeType()
             }
 
             is RecordTypeNode -> {

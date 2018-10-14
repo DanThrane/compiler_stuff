@@ -8,18 +8,19 @@ sealed class Scope {
     var parent: Scope? = null
         private set
 
-
-    fun putSymbol(name: String, type: Type) {
+    operator fun set(name: String, type: Type) {
         symbols[name] = Symbol(name, type)
     }
 
-    operator fun get(name: String): Symbol? = symbols[name]
+    operator fun get(name: String): Symbol = symbols[name]!!
 
-    fun getSymbolAndLevels(name: String): Pair<Symbol, Int>? {
+    fun getOrNull(name: String): Symbol? = symbols[name]
+
+    fun getSymbolAndLevelsOrNull(name: String): Pair<Symbol, Int>? {
         var currentScope: Scope? = this
         var level = 0
         while (currentScope != null) {
-            val symbol = currentScope[name]
+            val symbol = currentScope.getOrNull(name)
             if (symbol != null) {
                 return Pair(symbol, level)
             }
@@ -28,6 +29,8 @@ sealed class Scope {
         }
         return null
     }
+
+    fun getSymbolAndLevels(name: String): Pair<Symbol, Int> = getSymbolAndLevelsOrNull(name)!!
 
     fun <T : Scope> scopeSymbolTable(companion: ScopeCompanion<T>): T {
         val scope = companion.factory()

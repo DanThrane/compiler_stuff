@@ -162,7 +162,7 @@ class IfNode(
 class WhileNode(
     lineNumber: Int,
     var expression: ExpressionNode,
-    statementNode: StatementNode
+    var statementNode: StatementNode
 ) : StatementNode(lineNumber) {
     override val children = listOf(expression, statementNode)
 }
