@@ -1,5 +1,6 @@
 package dk.thrane.compiler.ast
 
+import dk.thrane.compiler.codegen.Generator
 import dk.thrane.compiler.type.SymbolGatherer
 import dk.thrane.compiler.type.TypeChecker
 import dk.thrane.compiler.weeder.ReturnCheck
@@ -15,6 +16,7 @@ fun main(args: Array<String>) {
     val gatherer = SymbolGatherer()
     val checker = TypeChecker()
     val returnCheck = ReturnCheck()
+    val generator = Generator()
 
     val ast = parser.parse(source)
     gatherer.traverse(ast)
@@ -22,5 +24,7 @@ fun main(args: Array<String>) {
     functionChecker.traverse(ast)
     returnCheck.traverse(ast)
     checker.traverse(ast)
+
+    generator.traverse(ast)
 }
 

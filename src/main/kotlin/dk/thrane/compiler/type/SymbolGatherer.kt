@@ -9,11 +9,13 @@ import dk.thrane.compiler.ast.VariableDeclarationNode
 import dk.thrane.compiler.ast.Visitor
 
 class SymbolGatherer : Visitor() {
-    val global: SymbolTable = SymbolTable()
-    private var currentScope: SymbolTable = global
+    val global = GlobalScope()
+    private var currentScope: Scope = global
 
-    private fun enterScope() {
-        currentScope = currentScope.scopeSymbolTable()
+    private fun <T : Scope> enterScope(companion: ScopeCompanion<T>): T {
+        val scopeSymbolTable = currentScope.scopeSymbolTable(companion)
+        currentScope = scopeSymbolTable
+        return scopeSymbolTable
     }
 
     private fun exitScope() {
@@ -24,27 +26,34 @@ class SymbolGatherer : Visitor() {
         node.scope = currentScope
         when (node) {
             is TypeDeclarationNode -> {
-                currentScope.putSymbol(node.name, node.typeNode.toNativeType())
+                currentScope[node.name] = node.typeNode.toNativeType()
             }
+
             is FunctionNode -> {
                 val parameterTypes = node.head.parameters.map { Pair(it.name, it.typeNode.toNativeType()) }
-                val returnType = if (node.head.typeNode != null) node.head.typeNode!!.toNativeType() else TypeUnit()
+                val returnType = if (node.head.typeNode != null) node.head.typeNode!!.toNativeType() else TypeUnit
                 val typeFunction = TypeFunction(parameterTypes, returnType)
-                currentScope.putSymbol(node.head.name, typeFunction)
-                enterScope()
-                currentScope.function = typeFunction
-                currentScope.putSymbol("#return", returnType)
+                currentScope[node.head.name] = typeFunction
+
+                val functionScope = enterScope(FunctionScope)
+                functionScope.function = typeFunction
+                functionScope["#return"] = returnType
+
+                node.function = typeFunction
             }
+
             is VariableDeclarationNode -> {
                 node.variables.forEach {
-                    currentScope.putSymbol(it.name, it.typeNode.toNativeType())
+                    currentScope[it.name] = it.typeNode.toNativeType()
                 }
             }
+
             is FieldDeclarationNode -> {
-                currentScope.putSymbol(node.name, node.typeNode.toNativeType())
+                currentScope[node.name] = node.typeNode.toNativeType()
             }
+
             is RecordTypeNode -> {
-                enterScope()
+                enterScope(RecordScope)
             }
 
             else -> {

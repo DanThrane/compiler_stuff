@@ -83,7 +83,7 @@ enum class Tokens(regex: String) {
         fun nextToken(cursor: Cursor, eat: Boolean = true): Token {
             T_WHITESPACE.consume(cursor)
             for (type in values()) {
-                var token = type.consume(cursor, eat)
+                val token = type.consume(cursor, eat)
                 if (token != null) {
                     return token
                 }
@@ -93,7 +93,7 @@ enum class Tokens(regex: String) {
 
         private fun consumeRegex(cursor: Cursor, regex: Pattern): String? {
             val source = cursor.remainingString
-            var found: Boolean = false
+            var found = false
             var match: String? = null
             for (i in 1..source.length) {
                 val potentialToken = source.substring(0, i)
@@ -108,14 +108,14 @@ enum class Tokens(regex: String) {
         }
 
         private fun consumeRegexToken(type: Tokens, cursor: Cursor, pattern: Pattern, eat: Boolean = true): Token? {
-            var token = consumeRegex(cursor, pattern)
-            if (token != null) {
+            val token = consumeRegex(cursor, pattern)
+            return if (token != null) {
                 if (eat) {
                     cursor.advance(token.length)
                 }
-                return Token(type, token)
+                Token(type, token)
             } else {
-                return null
+                null
             }
         }
     }
