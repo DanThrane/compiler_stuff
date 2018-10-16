@@ -175,8 +175,8 @@ root = initNode(0, leftChild, rightChild);
 func sumKeys(node: Node): int
     var keyValue: int;
     keyValue = 0;
-    if (node.leftChild != null) keyValue = keyValue + sumKeys(node.leftChild);
-    if (node.rightChild != null) keyValue = keyValue + sumKeys(node.rightChild);
+    if (node.leftChild != null) then keyValue = keyValue + sumKeys(node.leftChild);
+    if (node.rightChild != null) then keyValue = keyValue + sumKeys(node.rightChild);
     return keyValue + node.key;
 end sumKeys
 
