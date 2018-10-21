@@ -1,185 +1,187 @@
-#### Note, as the language goal is to provide a danish programming language, everything is subject to change.
-
 # DanskDiego
 
-DanskDiego is an imperative, procedural language, providing the world with a way to program in danish.
+DanskDiego er et imperativt, proceduremæssig sprog, der endelig giver en mulighed for at programmere på dansk.
 
-## Overview
+## Overblik
  
-DanskDiego provides a small, and simple language, writeable in the mother tongue of Hans Christian Andersen. 
-Coincidentally, the software was written in the birth city of the famed writer. 
+DanskDiego består at et småt simpelt sprog der skrives på HC Andersens modersmål. Compileren er udviklet i selvsamme
+persons fødeby.  
  
-## Data types
- 
-The primitive data types available in DanskDiego consists are `int`, `bool`, and `char`. Defining a variable is done using
-the `var` keyword, e.g.:
+## Data typer
+
+De primitive primitive datatyper der er tilgængelige i DanskDiego består af `heltal`, `bool` og `tegn`. 
+
+For at definere en variabel, bruges `variable` nøgleordet:
 
 ```
-var a: int;
+variable a: heltal;
 ```
 
-As seen above, a statement is terminated with a `;`.
+Som det ses, sluttes en sætning med `;`.
 
-Multiple variables can be instantiated on the same line, by separating using a comma, as follows:
+Flere variabler kan instantieres på samme linje, adskildt med komma på følgende måde:
 
 ```
-var a: int, b: bool, c: char;
+variable a: heltal, b: bool, c: tegn;
 ```
 
 ## Type
 
-The keyword `type` can be used to define a type. E.g. `type id = int;` would alias `id` to the `int` data type.
+Nøgleordet `type` kan bruges til at definere en type. F.eks. `type id = heltal` gør `id` lig med `heltal` data typen.
 
-## Collections
+## Samlinger
 
-DanskDiego supports `arrays`, and `records`. To define an array, prefix the type with `array of`, e.g.
-
-```
-var a: array of int, b: array of bool, c: array of array of char;
-```
-
-Where `c` is a two-dimensional array.
-
-As the code reads, no size is defined for the arrays. This is done by using the `allocate` keyword. Using the `allocate` 
-keyword requires use of a size, given as an integer, e.g.:
+DanskDiego understøtter opstilling, og datastrukturer. For at definere en opstilling bruges `opstilling af`, med f.eks.:
+ 
 
 ```
-allocate b of length 5;
+variable a: opstilling af heltal, b: opstilling af bool, c: opstilling af opstilling af tegn;
 ```
 
-Which in conjunction with the previous snippet allocate `b` as an array of booleans of size 5.
+Hvor `c` er en to-dimensionel opstilling.
 
-Accessing values in an array are done using brackets. Accessing the 0th index in an array would be written as `arr[0]`. 
-
-A record is similar to a C-struct, and uses the keywords `record of` to define. An example:
+Som det kan læses i koden, er der ikke defineret en længde for opstillingerne. Det gøres med `allok` nøgleorder, hvor
+man tildeler en størrelse vha. et heltalt:
 
 ```
-var rec: record of { a: int, b: bool };
+allok b af længde 5;
 ```
 
-Which creates a structure with the children being accessible through `.`, e.g. `rec.a` or `rec.b`.
+Hvilket i samarbejde med foregående kode allokerer `b` som en opstilling af booler af størrelse 5.
+
+For at tilgå en værdi i en opstilling bruges vinkelparenteser. For at tilgå det første index i en opstilling skrives det
+`arr[0]`.
+ 
+En datastruktur er tilsvarende til en C-datastruktur og bruger nøgleordene `datastruktur af`. F.eks.:
+
+```
+variable rec: datastruktur af { a: heltal, b: bool };
+```
+
+Hvilket laver en struktur med børnene der kan tilgås med `.`, f.eks. `rec.a` eller `rec.b`. 
 
 Like arrays, records will need to be allocated, which is done similarly to arrays, but without the size:
 
 ```
-var rec: record of { a: int, b: bool };
-allocate rec;
+variable rec: datastruktur af { a: heltal, b: bool };
+allok rec;
 ```
 
-Records can be defined using the `type` keyword, e.g. for creation of binary trees:
+Datastrukturer kan defineres med `type` nøgleordet, f.eks. for binære træer:
 
 ```
-type Node = record { leftChild: Node, rightChild: Node, key: int };
+type Knude = datastruktur af { venstreBarn: Knude, højreBarn: Knude, nøgle: heltal };
 ```
 
-Which defines a node of a binary tree.
+Som bruges til at definere en knude af et binært træ.
 
-## Functions
+## Funktioner
 
-Defining a function is done using the `func` keyword. A function must have a name and a return type, and be terminated 
-by `end` followed by the function name.
+For at definere en funktion bruges `funktion`. En funktion skal have et navn og en type der returneres og skal termineres
+med `slut` efterfulgt af samme funktionsnavn. 
 
-A function returning an integer would be defined like this:
+En funktion der vender tilbage med et heltal defineres på følgende måde:
 
 ```
-func returnInteger(a: int): int
+funktion vendTilbageMedHeltal(a: heltal): heltal
     return a;
-end returnInteger
+end vendTilbageMedHeltal
 ```
 
-which defines the function `returnInteger` which takes a single argument, an integer.
+som definerer en funktion `vendTilbageMedHeltal` som tager et enkelt argument, et heltal.
 
-Calling the function is done like most C-like programming languages:
-
-```
-returnInteger(5);
-```
-
-## Array length and absolute value
-
-To retrieve the length of an array, the pipe operator can be used:
+For at kalde funktionen bruges samme standard som fleste C-lignende sprog:
 
 ```
-var length: int, arr: array of int;
-allocate arr of length 5;
-length = |arr|;
-write length; // 5
+vendTilbageMedHeltal(5);
 ```
 
-Additionally, the pipe operator can also be used on an integer to get the absolute value, e.g:
+## Opstillingslængde og numerisk værdi
+
+For at hente længden af en opstilling kan rør-operatoren bruges:
 
 ```
-var a: int;
+variable længde: heltal, opst: opstilling af heltal;
+allok opst af længde 5;
+længde = |opst|;
+skriv længde; // 5
+```
+
+Derudover, kan rør-operatoren bruges til at få den numeriske værdi, f.eks.:
+
+```
+variable a: heltal;
 a = 0-5;
-write |a|; // 5
+skriv |a|; // 5
 ```
 
-## Comparisons
+## Sammenligninger
 
-DanskDiego has `true` and `false` as boolean constants, and `null` for usage with records or arrays.
+DanskDiego har `sandt` og `falsk` som boolske kosntanter, og `nul` til brug med opstillinger og datastrukturer.
 
-Equality operators in Diego are similar to most other imperative languages, being `==` for equality, `!=` for inequality.
-Additionally, the language has `<`, `>`, `<=`, `>=` for equality checks.
+Ækvivalens operatorer i Dansk Diego er tilsvarende til de fleste andre imperative sprog, med `==` for lighed, `!=` for ulighed.
 
-## Control flow
+Derudover har sproget `<`, `>`, `<=`, `>=` for lighedstjek.
 
-### If-statements
+## Kontrol strukturer
 
-If-statements in DanskDiego can be followed a else-statement, or have the else omitted. The predicate must be enclosed by
-a parenthesis. Predicates can be chained using the `&&` or the `||` operators.
+### Hvis-sætninger
 
-```
-if (i == 0) write 1;
-else write 0; // Can be omitted
-```
-
-If-statements can contain either a single statement or statement list (enclosed by curly braces).
-
-### While loops
-
-While loops syntax require a predicate, similar to if statements, but the predicate is followed by the keyword `do`, e.g.:
+Hvis-sætninger i DanskDiego kan være efterfulgt af en ellers-sætning, hvilket også kan undlades. Et prædikat skal omsluttes af
+parenteser. Prædikater kan kædes sammen med `&&` eller `||` operatorerne.
 
 ```
-var i: int;
+hvis (i == 0) så skriv 1;
+ellsers skriv 0; // Kan undlades
+```
+
+Hvis-sætninger kan indeholder en enkel sætning, eller en liste af sætninger, hvilket er omgivet af tuborgklammer.
+
+### Så længe-løkker
+
+Så længe-løkker syntaksen kræver et prædikat, tilsvarende til hvis-sætninger, men prædikatet efterfølges af `gør` nøgleordet, f.eks.:
+
+```
+variable i: heltal;
 i = 5;
-while (i < 5) do write i;
+så længe (i < 5) gør skriv i;
 ```
 
-The body of a while statement can either be a single statement, or list of statements.
+Kroppen af en så længe-løkke kan enten være en enkelt sætning eller en liste af sætninger.
 
-## Hello World
+## Goddag, Verden!
 
-The Hello World-program in DanskDiego is done using the primitive `write`, and can be done at the top level:
-
-```
-write "Hello, World!";
-```
-
-## Binary tree traversal
+Goddag, Verden-programmet i DanskDiego løses med `skriv`-primitiven, og kan gøres ved øverste niveau.
 
 ```
-type Node = record of { leftChild: Node, rightChild: Node, key: int };
-func initNode(key: int, leftChild: Node, rightChild: Node): Node
-    var n: Node;
-    n.key = key;
-    n.leftChild = leftChild;
-    n.rightChild = rightChild;
-    return n;
-end initNode
+srkiv "Goddag, Verden!";
+```
 
-var leftChild: Node, rightChild: Node, root: Node;
-leftChild = initNode(1, null, null);
-rightChild = initNode(2, null, null);
-root = initNode(0, leftChild, rightChild);
+## Binært træ gennemgang
 
-func sumKeys(node: Node): int
-    var keyValue: int;
-    keyValue = 0;
-    if (node.leftChild != null) keyValue = keyValue + sumKeys(node.leftChild);
-    if (node.rightChild != null) keyValue = keyValue + sumKeys(node.rightChild);
-    return keyValue + node.key;
-end sumKeys
+```
+type Knude = datastruktur af { venstreBarn: Knud, højreBarn: Knude, nøgle: heltal };
+funktion initialiserKnude(nøgle: heltal, venstreBarn: Knude, højreBarn: Knude): Knude
+    variable k: Knude;
+    k.nøgle = nøgle;
+    k.venstreBarn = venstreBarn;
+    k.højreBarn = højreBarn;
+    return k;
+slut initialiserKnude
 
-write sumKeys(root); // 3
+variable venstreBarn: Knude, højreBarn: Knude, rod: Knude;
+venstreBarn = initialiserKnude(1, nul, nul);
+højreBarn = initialiserKnude(2, nul, nul);
+rod = initialiserKnude(0, venstreBarn, højreBarn);
+
+funktion summerNøgler(knude: Knude): heltal
+    var nøgleVærdi: heltal;
+    nøgleVærdi = 0;
+    hvis (knude.venstreBarn != nul) så nøgleVærdi = nøgleVærdi + summerNøgler(knude.venstreBarn);
+    hvis (knude.højreBarn != nul) så nøgleVærdi = nøgleVærdi + summerNøgler(knude.højreBarn);
+    return nøgleVærdi + knude.nøgle;
+slut summerNøgler
+
+skriv summerNøgler(root); // 3
 ```
 
